@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raio-X da sua marca na IA — Papa PPG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F4F1EB;
+      --surface: #FFFEFB;
+      --border: #E2DDD4;
+      --text: #1C1917;
+      --muted: #78716C;
+      --accent: #1C1917;
+      --accent-light: #EDE9E0;
+      --red: #C0392B;
+      --orange: #D97706;
+      --green: #15803D;
+      --green-light: #DCFCE7;
+      --red-light: #FEE2E2;
+      --orange-light: #FEF3C7;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2.5rem 1rem 4rem;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    .header {
+      margin-bottom: 2.5rem;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.75rem;
+    }
+
+    .logo-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--text);
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-weight: 300;
+    }
+
+    /* CARD */
+    .card {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .step { display: none; }
+    .step.active { display: block; }
+
+    /* FORM */
+    .form-section-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 1.5rem 0 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-section-label:first-child { margin-top: 0; }
+
+    .field { margin-bottom: 1rem; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: #57534E;
+      margin-bottom: 5px;
+      letter-spacing: 0.01em;
+    }
+
+    label .opt {
+      font-weight: 400;
+      color: #A8A29E;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 13px;
+      font-size: 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--text);
+      transition: border-color 0.15s, background 0.15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--text);
+      background: var(--surface);
+    }
+
+    input::placeholder, textarea::placeholder { color: #C4BEB8; }
+
+    textarea { height: 72px; resize: vertical; }
+
+    .field-row { display: flex; gap: 10px; }
+    .field-row .field { flex: 1; }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 14px 24px;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      background: var(--text);
+      color: #fff;
+      margin-top: 1.25rem;
+      transition: all 0.15s;
+    }
+
+    .btn-primary:hover { background: #333; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .error-msg {
+      font-size: 12px;
+      color: var(--red);
+      margin-top: 8px;
+      display: none;
+    }
+
+    /* LOADING */
+    .loader-wrap { text-align: center; padding: 0.5rem 0 1.5rem; }
+
+    .spinner {
+      width: 40px; height: 40px;
+      border: 2.5px solid var(--border);
+      border-top-color: var(--text);
+      border-radius: 50%;
+      margin: 0 auto 1.5rem;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loader-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.01em;
+    }
+
+    .progress-steps { list-style: none; display: inline-block; text-align: left; }
+
+    .progress-steps li {
+      font-size: 13px;
+      color: #C4BEB8;
+      padding: 5px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: color 0.3s;
+      font-weight: 300;
+    }
+
+    .progress-steps li .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #E2DDD4;
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+
+    .progress-steps li.done { color: var(--muted); }
+    .progress-steps li.done .dot { background: var(--green); }
+    .progress-steps li.active { color: var(--text); font-weight: 500; }
+    .progress-steps li.active .dot { background: var(--text); animation: pulse 1s infinite; }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .loader-note { font-size: 11px; color: #C4BEB8; margin-top: 1.25rem; }
+
+    /* RESULTADO */
+    .score-area {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .score-ring {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      border: 5px solid var(--border);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: border-color 0.5s;
+    }
+
+    .score-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .score-max { font-size: 11px; color: var(--muted); }
+
+    .score-text { flex: 1; }
+    .score-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      letter-spacing: -0.01em;
+    }
+
+    .score-sub { font-size: 13px; color: var(--muted); line-height: 1.55; font-weight: 300; }
+
+    .geo-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 3px 9px;
+      border-radius: 20px;
+      background: var(--accent-light);
+      color: var(--muted);
+      margin-top: 8px;
+      letter-spacing: 0.02em;
+    }
+
+    /* ACESSIBILIDADE */
+    .crawlers-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin-top: 0.5rem;
+    }
+
+    .crawler-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .crawler-item.ok { background: var(--green-light); border-color: #BBF7D0; color: #166534; }
+    .crawler-item.blocked { background: var(--red-light); border-color: #FECACA; color: #991B1B; }
+    .crawler-item.unknown { background: var(--orange-light); border-color: #FDE68A; color: #92400E; }
+
+    .crawler-icon { font-size: 10px; }
+
+    .access-score-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      margin: 0.75rem 0 0.5rem;
+      overflow: hidden;
+    }
+
+    .access-score-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1s ease;
+    }
+
+    .access-note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    /* DIMENSÕES */
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 1.5rem 0 0.65rem;
+    }
+
+    .dims { display: flex; flex-direction: column; gap: 10px; }
+
+    .dim-row {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      gap: 12px;
+    }
+
+    .dim-label { color: var(--muted); min-width: 110px; font-weight: 300; }
+
+    .dim-bar {
+      flex: 1; height: 3px;
+      background: var(--border); border-radius: 2px;
+    }
+
+    .dim-fill {
+      height: 100%; border-radius: 2px;
+      background: var(--text);
+      transition: width 1.2s ease;
+    }
+
+    .dim-val {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      min-width: 28px;
+      text-align: right;
+    }
+
+    /* BLOCOS */
+    .block {
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.65rem;
+      font-size: 13.5px;
+      line-height: 1.75;
+      color: #44403C;
+      white-space: pre-wrap;
+      font-weight: 300;
+    }
+
+    .next-step {
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 0.9rem 1.25rem;
+      margin-bottom: 0.65rem;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .next-step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted);
+      min-width: 20px;
+      padding-top: 2px;
+    }
+
+    .next-step-body {}
+    .next-step-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+    .next-step-desc { font-size: 12px; color: var(--muted); line-height: 1.55; font-weight: 300; }
+
+    /* CTA */
+    .cta-area {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-cta {
+      flex: 1; padding: 12px 18px;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px; font-weight: 700;
+      border-radius: 10px; border: none;
+      cursor: pointer; font-family: inherit;
+      letter-spacing: 0.01em;
+      transition: all 0.15s;
+    }
+
+    .btn-cta-primary { background: var(--text); color: #fff; }
+    .btn-cta-primary:hover { background: #333; }
+    .btn-cta-secondary { background: var(--accent-light); color: var(--text); }
+    .btn-cta-secondary:hover { background: #E5E1D8; }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      margin-top: 2.5rem;
+      font-size: 11px;
+      color: #C4BEB8;
+      letter-spacing: 0.02em;
+    }
+
+    /* BADGE NO TOPO DO RESULTADO */
+    .result-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: var(--accent-light);
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 1.25rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="logo">
+      <span class="logo-dot"></span>
+      Papa PPG
+    </div>
+    <h1>Se um cliente perguntasse pra IA quem contratar no seu mercado… sua empresa apareceria?</h1>
+    <p class="subtitle">Diagnóstico de visibilidade em IAs generativas — com score, análise de acessibilidade para crawlers e plano de ação.</p>
+  </div>
+
+  <!-- FORMULÁRIO -->
+  <div class="card step active" id="step-form">
+
+    <div class="form-section-label">Dados da empresa</div>
+
+    <div class="field">
+      <label>Nome da empresa</label>
+      <input type="text" id="empresa" placeholder="Ex: O Boticário" />
+    </div>
+    <div class="field">
+      <label>Site <span class="opt">(opcional, mas recomendado)</span></label>
+      <input type="text" id="site" placeholder="Ex: boticario.com.br" />
+    </div>
+    <div class="field">
+      <label>Segmento / mercado de atuação</label>
+      <input type="text" id="segmento" placeholder="Ex: cosméticos e perfumaria" />
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Cidade</label>
+        <input type="text" id="cidade" placeholder="Ex: São Paulo" />
+      </div>
+      <div class="field">
+        <label>Estado <span class="opt">(opcional)</span></label>
+        <input type="text" id="estado" placeholder="Ex: SP" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Abrangência geográfica</label>
+      <select id="abrangencia">
+        <option value="cidade">Somente a cidade informada</option>
+        <option value="regiao">Região (cidades próximas)</option>
+        <option value="estado">Estado inteiro</option>
+        <option value="nacional">Nacional</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Principais concorrentes <span class="opt">(opcional)</span></label>
+      <input type="text" id="concorrentes" placeholder="Ex: Concorrente A, Concorrente B" />
+    </div>
+    <div class="field">
+      <label>Observação adicional <span class="opt">(opcional)</span></label>
+      <textarea id="obs" placeholder="Contexto que ajude na análise"></textarea>
+    </div>
+
+    <div class="form-section-label">Seus dados de contato</div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Seu nome</label>
+        <input type="text" id="nome_contato" placeholder="Ex: Maria Silva" />
+      </div>
+      <div class="field">
+        <label>Seu e-mail</label>
+        <input type="email" id="email_contato" placeholder="Ex: maria@empresa.com.br" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Cargo <span class="opt">(opcional)</span></label>
+      <input type="text" id="cargo_contato" placeholder="Ex: Diretora de Marketing" />
+    </div>
+
+    <button class="btn-primary" onclick="startAnalysis()">Analisar presença na IA →</button>
+    <p class="error-msg" id="form-error">Preencha pelo menos nome da empresa, segmento e cidade.</p>
+  </div>
+
+  <!-- LOADING -->
+  <div class="card step" id="step-loading">
+    <div class="loader-wrap">
+      <div class="spinner"></div>
+      <p class="loader-title">Analisando sua marca na IA</p>
+      <ul class="progress-steps">
+        <li id="p1"><span class="dot"></span>Verificando acessibilidade para crawlers de IA</li>
+        <li id="p2"><span class="dot"></span>Simulando perguntas de decisão</li>
+        <li id="p3"><span class="dot"></span>Analisando presença e autoridade</li>
+        <li id="p4"><span class="dot"></span>Identificando quem domina no segmento</li>
+        <li id="p5"><span class="dot"></span>Montando diagnóstico e plano de ação</li>
+      </ul>
+      <p class="loader-note">Isso pode levar até 40 segundos</p>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="step" id="step-result">
+    <div class="card">
+
+      <div class="result-badge">
+        <span>◎</span> Diagnóstico GEO — Papa PPG
+      </div>
+
+      <!-- SCORE -->
+      <div class="score-area">
+        <div class="score-ring" id="score-ring">
+          <span class="score-num" id="score-val">—</span>
+          <span class="score-max">/100</span>
+        </div>
+        <div class="score-text">
+          <p class="score-label" id="score-label"></p>
+          <p class="score-sub" id="score-sub"></p>
+          <span class="geo-tag" id="geo-tag"></span>
+        </div>
+      </div>
+
+      <!-- ACESSIBILIDADE CRAWLERS -->
+      <p class="section-title">Acessibilidade para IAs</p>
+      <div class="access-score-bar">
+        <div class="access-score-fill" id="access-bar" style="width:0%"></div>
+      </div>
+      <p class="access-note" id="access-note"></p>
+      <div class="crawlers-grid" id="crawlers-grid"></div>
+
+      <!-- DIMENSÕES -->
+      <p class="section-title">Dimensões de presença</p>
+      <div class="dims">
+        <div class="dim-row">
+          <span class="dim-label">Autoridade</span>
+          <div class="dim-bar"><div class="dim-fill" id="bar-autoridade" style="width:0%"></div></div>
+          <span class="dim-val" id="val-autoridade">—</span>
+        </div>
+        <div class="dim-row">
+          <span class="dim-label">Cobertura</span>
+          <div class="dim-bar"><div class="dim-fill" id="bar-cobertura" style="width:0%"></div></div>
+          <span class="dim-val" id="val-cobertura">—</span>
+        </div>
+        <div class="dim-row">
+          <span class="dim-label">Posicionamento</span>
+          <div class="dim-bar"><div class="dim-fill" id="bar-posicionamento" style="width:0%"></div></div>
+          <span class="dim-val" id="val-posicionamento">—</span>
+        </div>
+        <div class="dim-row">
+          <span class="dim-label">Frescor</span>
+          <div class="dim-bar"><div class="dim-fill" id="bar-frescor" style="width:0%"></div></div>
+          <span class="dim-val" id="val-frescor">—</span>
+        </div>
+      </div>
+
+      <p class="section-title">Diagnóstico</p>
+      <div class="block" id="txt-diagnostico"></div>
+
+      <p class="section-title">O que a IA responde sobre seu segmento</p>
+      <div class="block" id="txt-perguntas"></div>
+
+      <p class="section-title">Quem está dominando</p>
+      <div class="block" id="txt-dominando"></div>
+
+      <p class="section-title">Onde você deveria aparecer (e não aparece)</p>
+      <div class="block" id="txt-gaps"></div>
+
+      <p class="section-title">O que fazer agora</p>
+      <div id="next-steps"></div>
+
+      <div class="cta-area">
+        <button class="btn-cta btn-cta-secondary" onclick="restart()">Nova análise</button>
+        <button class="btn-cta btn-cta-primary" onclick="window.location.href='mailto:contato@papappg.com.br?subject=Quero um plano de ação GEO completo'">Quero um plano de ação →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Desenvolvido por Papa PPG · Estratégia de conteúdo e presença na era da IA</div>
+</div>
+
+<script>
+let progressTimer;
+
+const CRAWLERS = [
+  { name: 'GPTBot', label: 'ChatGPT' },
+  { name: 'Claude-Web', label: 'Claude' },
+  { name: 'ClaudeBot', label: 'Claude' },
+  { name: 'PerplexityBot', label: 'Perplexity' },
+  { name: 'Google-Extended', label: 'Gemini' },
+  { name: 'GoogleOther', label: 'Google AI' },
+  { name: 'Bytespider', label: 'ByteDance' },
+  { name: 'FacebookBot', label: 'Meta AI' },
+];
+
+function advanceProgress(step) {
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('p' + i);
+    el.classList.remove('active', 'done');
+    if (i < step) el.classList.add('done');
+    else if (i === step) el.classList.add('active');
+  }
+}
+
+function startAnalysis() {
+  const empresa = document.getElementById('empresa').value.trim();
+  const segmento = document.getElementById('segmento').value.trim();
+  const cidade = document.getElementById('cidade').value.trim();
+  if (!empresa || !segmento || !cidade) {
+    document.getElementById('form-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('form-error').style.display = 'none';
+  showStep('step-loading');
+
+  let step = 1;
+  advanceProgress(step);
+  progressTimer = setInterval(() => {
+    step++;
+    if (step <= 5) advanceProgress(step);
+  }, 6000);
+
+  fetch('/api/analisar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      empresa,
+      site: document.getElementById('site').value.trim(),
+      segmento,
+      cidade,
+      estado: document.getElementById('estado').value.trim(),
+      abrangencia: document.getElementById('abrangencia').value,
+      concorrentes: document.getElementById('concorrentes').value.trim(),
+      obs: document.getElementById('obs').value.trim(),
+      nome_contato: document.getElementById('nome_contato').value.trim(),
+      email_contato: document.getElementById('email_contato').value.trim(),
+      cargo_contato: document.getElementById('cargo_contato').value.trim(),
+    })
+  })
+  .then(r => r.json())
+  .then(result => {
+    clearInterval(progressTimer);
+    if (result.error) throw new Error(result.error);
+    renderResult(result);
+  })
+  .catch(() => {
+    clearInterval(progressTimer);
+    showStep('step-form');
+    const err = document.getElementById('form-error');
+    err.textContent = 'Erro na análise. Tente novamente em alguns segundos.';
+    err.style.display = 'block';
+  });
+}
+
+function renderCrawlers(crawlerStatus) {
+  // crawlerStatus = { GPTBot: 'ok'|'blocked'|'unknown', ... }
+  const grid = document.getElementById('crawlers-grid');
+  const note = document.getElementById('access-note');
+  const bar = document.getElementById('access-bar');
+
+  if (!crawlerStatus || Object.keys(crawlerStatus).length === 0) {
+    note.textContent = 'Não foi possível verificar o robots.txt (site não informado ou inacessível).';
+    bar.style.width = '0%';
+    bar.style.background = '#E2DDD4';
+    grid.innerHTML = '';
+    return;
+  }
+
+  const icons = { ok: '✓', blocked: '✕', unknown: '?' };
+  const labels = { ok: 'Liberado', blocked: 'Bloqueado', unknown: 'Indefinido' };
+
+  let okCount = 0;
+  let html = '';
+
+  CRAWLERS.forEach(c => {
+    const status = crawlerStatus[c.name] || 'unknown';
+    if (status === 'ok') okCount++;
+    html += `
+      <div class="crawler-item ${status}">
+        <span class="crawler-icon">${icons[status]}</span>
+        <span>${c.label} <span style="opacity:0.6;font-size:10px">(${c.name})</span></span>
+      </div>`;
+  });
+
+  grid.innerHTML = html;
+
+  const pct = Math.round((okCount / CRAWLERS.length) * 100);
+  bar.style.width = pct + '%';
+  bar.style.background = pct >= 70 ? '#15803D' : pct >= 40 ? '#D97706' : '#C0392B';
+
+  if (pct === 0) {
+    note.textContent = 'Todos os crawlers de IA estão bloqueados. As IAs não conseguem indexar seu site — isso impacta diretamente sua visibilidade nas respostas do ChatGPT, Gemini e Perplexity.';
+  } else if (pct < 50) {
+    note.textContent = `Apenas ${okCount} de ${CRAWLERS.length} crawlers estão liberados. Sua visibilidade está comprometida na maioria das IAs generativas.`;
+  } else if (pct < 100) {
+    note.textContent = `${okCount} de ${CRAWLERS.length} crawlers liberados. Há oportunidade de ampliar sua cobertura nas IAs.`;
+  } else {
+    note.textContent = 'Todos os crawlers de IA estão liberados. Seu site está acessível para indexação pelas principais IAs generativas.';
+  }
+}
+
+function renderResult(r) {
+  const score = Math.round(r.score || 0);
+  document.getElementById('score-val').textContent = score;
+  document.getElementById('score-label').textContent = r.scoreLabel || '';
+  document.getElementById('score-sub').textContent = r.scoreSub || '';
+  document.getElementById('geo-tag').textContent = 'Recorte: ' + (r.geo || '');
+
+  const ring = document.getElementById('score-ring');
+  ring.style.borderColor = score < 35 ? '#C0392B' : score < 65 ? '#D97706' : '#15803D';
+
+  // Crawlers
+  renderCrawlers(r.crawlerStatus || {});
+
+  // Dimensões (agora com frescor)
+  const d = r.dimensoes || {};
+  ['autoridade','cobertura','posicionamento','frescor'].forEach(k => {
+    const v = Math.round(d[k] || 0);
+    document.getElementById('bar-' + k).style.width = v + '%';
+    document.getElementById('val-' + k).textContent = v;
+  });
+
+  document.getElementById('txt-diagnostico').textContent = r.diagnostico || '';
+  document.getElementById('txt-perguntas').textContent = r.perguntasSimuladas || '';
+  document.getElementById('txt-dominando').textContent = r.quemDomina || '';
+  document.getElementById('txt-gaps').textContent = r.gaps || '';
+
+  document.getElementById('next-steps').innerHTML = (r.proximosPassos || []).map((s, i) => `
+    <div class="next-step">
+      <span class="next-step-num">0${i+1}</span>
+      <div class="next-step-body">
+        <div class="next-step-title">${s.titulo}</div>
+        <div class="next-step-desc">${s.descricao}</div>
+      </div>
+    </div>
+  `).join('');
+
+  showStep('step-result');
+}
+
+function showStep(id) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function restart() {
+  showStep('step-form');
+}
+</script>
+</body>
+</html>
