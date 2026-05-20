@@ -1,157 +1,590 @@
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raio-X da sua marca na IA — Papa PPG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  const {
-    empresa, site, segmento, cidade, estado, abrangencia,
-    concorrentes, obs, nome_contato, email_contato
-  } = req.body;
-
-  if (!empresa || !segmento || !cidade) {
-    return res.status(400).json({ error: 'Campos obrigatórios faltando' });
-  }
-
-  const geo = abrangencia === 'cidade' ? `${cidade}${estado ? ', ' + estado : ''}`
-    : abrangencia === 'regiao' ? `Região de ${cidade}${estado ? ', ' + estado : ''}`
-    : abrangencia === 'estado' ? (estado || cidade)
-    : 'Nacional';
-
-  const abrangenciaTexto = {
-    cidade: `somente a cidade de ${cidade}`,
-    regiao: `a região de ${cidade} e cidades próximas`,
-    estado: `o estado de ${estado || cidade} inteiro`,
-    nacional: 'todo o Brasil'
-  }[abrangencia] || `a cidade de ${cidade}`;
-
-  async function notificarFormspree() {
-    try {
-      await fetch('https://formspree.io/f/mwvzlbeo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          nome: nome_contato || '—',
-          email: email_contato || '—',
-          empresa,
-          segmento,
-          cidade: `${cidade}${estado ? ', ' + estado : ''}`,
-          _subject: `Novo Raio-X: ${empresa} (${geo})`
-        })
-      });
-    } catch (e) {
-      console.log('Formspree erro (não crítico):', e.message);
+    :root {
+      --cinza-fundo: #f0efec;
+      --branco: #ffffff;
+      --preto: #1a1a18;
+      --cinza-texto: #555550;
+      --borda: #e2e0db;
+      --laranja: #e07820;
     }
-  }
 
-  notificarFormspree();
+    body {
+      font-family: "Open Sans", sans-serif;
+      background: var(--cinza-fundo);
+      color: var(--preto);
+      min-height: 100vh;
+      padding: 2.5rem 1rem;
+    }
 
-  const hoje = new Date().toLocaleDateString('pt-BR');
+    .container { max-width: 640px; margin: 0 auto; }
 
-  const prompt = `Você é um especialista em GEO (Generative Engine Optimization) e visibilidade de marcas em IAs generativas.
+    .header { margin-bottom: 3rem; }
 
-Sua tarefa é fazer uma análise REAL e BASEADA EM EVIDÊNCIAS da presença digital da empresa abaixo.
+    .logo-text {
+      display: block;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-bottom: 2rem;
+    }
 
-DADOS DA EMPRESA:
-- Nome: ${empresa}
-- Site: ${site || 'não informado'}
-- Segmento: ${segmento}
-- Área de atuação: ${abrangenciaTexto}
-- Concorrentes: ${concorrentes || 'não informados'}
-- Observações: ${obs || 'nenhuma'}
+    h1 {
+      font-family: "Montserrat", sans-serif;
+      font-weight: 900;
+      font-size: 26px;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+      color: var(--preto);
+    }
 
-INSTRUÇÕES:
-1. Use web search para buscar informações REAIS sobre esta empresa. Faça as seguintes buscas:
-   - "${empresa} ${cidade}" — presença geral
-   - "${empresa} site:reclameaqui.com.br" — reputação
-   - "${empresa} avaliação OR review OR reclamação" — o que clientes dizem
-   - "melhores empresas ${segmento} ${geo}" — quem aparece no lugar dela
-   - "${empresa} ${segmento}" — autoridade no segmento
+    h1 em { font-style: normal; color: var(--laranja); }
 
-2. Com base no que ENCONTROU de verdade (não simule), avalie:
-   - A empresa tem site ativo e bem estruturado?
-   - Aparece em diretórios, portais, notícias locais?
-   - Tem avaliações em plataformas públicas indexadas?
-   - Produz conteúdo relevante para o segmento?
-   - Concorrentes aparecem mais do que ela nas buscas?
+    .subtitle {
+      font-size: 15px;
+      color: var(--cinza-texto);
+      line-height: 1.7;
+      font-weight: 300;
+    }
 
-3. IMPORTANTE sobre o diagnóstico e gaps:
-   - Baseie-se apenas no que foi encontrado nas buscas textuais realizadas
-   - NÃO faça afirmações sobre ausência de Google Meu Negócio, LinkedIn ou outros perfis que não são indexados em buscas textuais — esses canais existem mas não aparecem nos resultados de busca que você acessa
-   - Foque nos gaps de visibilidade que são verificáveis: ausência em rankings, diretórios de texto, portais, notícias, conteúdo indexado
-   - Use linguagem de evidência: "não foram encontradas menções em...", "nos resultados analisados, não aparece em..."
+    .card {
+      background: var(--branco);
+      border-radius: 4px;
+      padding: 2rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--borda);
+    }
 
-4. Avalie nas 3 dimensões (0-100) com critério realista:
-   - Autoridade (peso 40%): 0-20 = nunca citada; 21-40 = raramente; 41-60 = às vezes em buscas genéricas; 61-80 = frequente; 81-100 = referência do segmento
-   - Cobertura (peso 30%): 0-20 = ausente em todas as perguntas; 21-50 = aparece em 1 pergunta; 51-75 = aparece em 2-3; 76-100 = presente em todas
-   - Posicionamento (peso 30%): 0-30 = mercado não reconhecido pela IA; 31-60 = mercado existe mas empresa não está posicionada; 61-80 = posicionada mas genérica; 81-100 = posicionamento claro e diferenciado
+    .step { display: none; }
+    .step.active { display: block; }
 
-5. Score = (autoridade * 0.4) + (cobertura * 0.3) + (posicionamento * 0.3)
+    .section-divider {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #bbb;
+      margin: 1.75rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--borda);
+    }
 
-Referência de scores:
-- 0-25: empresa invisível, sem presença digital indexada relevante
-- 26-45: presença mínima, aparece em poucos contextos indexados
-- 46-65: presença moderada, reconhecida em algumas buscas — empresa com site ativo e conteúdo deve ficar nessa faixa
-- 66-80: boa presença, aparece consistentemente em buscas do segmento
-- 81-100: referência do segmento nas IAs
+    .section-divider:first-child { margin-top: 0; }
 
-Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de código:
-{
-  "score": 35,
-  "scoreLabel": "frase curta descrevendo o nível real de presença encontrado",
-  "scoreSub": "frase de impacto baseada no que foi encontrado nas buscas",
-  "dimensoes": { "autoridade": 30, "cobertura": 35, "posicionamento": 40 },
-  "diagnostico": "2-3 frases baseadas no que foi encontrado de verdade nas buscas. Mencione evidências reais. Mencione a empresa pelo nome e o recorte de ${geo}.",
-  "perguntasSimuladas": "Com base nas buscas realizadas, descreva em texto corrido o que uma IA generativa responderia sobre ${segmento} em ${geo} e se ${empresa} apareceria ou não. Máximo 4 parágrafos.",
-  "quemDomina": "Com base nas buscas, quem realmente aparece quando se busca ${segmento} em ${geo}. Seja específico sobre o que foi encontrado.",
-  "gaps": "3-4 lacunas de visibilidade identificadas nas buscas — use linguagem de evidência baseada no que foi encontrado, sem afirmar ausência de canais não verificáveis via busca textual.",
-  "proximosPassos": [
-    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"},
-    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"},
-    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"}
-  ],
-  "notaMetodologica": "Diagnóstico baseado em evidências de indexação pública coletadas em ${hoje}. Canais como Google Meu Negócio, LinkedIn e redes sociais existem mas podem não aparecer em buscas textuais — o score reflete visibilidade em conteúdo indexado publicamente."
-}`;
+    .field { margin-bottom: 1.25rem; }
 
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5',
-        max_tokens: 3000,
-        temperature: 0,
-        tools: [{
-          type: 'web_search_20250305',
-          name: 'web_search',
-          max_uses: 5
-        }],
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--cinza-texto);
+      margin-bottom: 6px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
 
-    const data = await response.json();
-    console.log('Status API:', response.status);
+    label .opt { font-weight: 400; text-transform: none; color: #aaa; }
 
-    const textBlocks = (data.content || [])
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
-      .join('')
-      .trim();
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 14px;
+      font-size: 15px;
+      border: 1px solid var(--borda);
+      border-radius: 2px;
+      background: var(--cinza-fundo);
+      color: var(--preto);
+      font-family: "Open Sans", sans-serif;
+      outline: none;
+      transition: border-color 0.15s;
+    }
 
-    const clean = textBlocks.replace(/```json|```/g, '').trim();
-    const jsonMatch = clean.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('JSON inválido');
-    const result = JSON.parse(jsonMatch[0]);
-    return res.status(200).json({ ...result, geo });
-  } catch (e) {
-    console.log('Erro:', e.message);
-    return res.status(500).json({ error: 'Erro na análise. Tente novamente.' });
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--preto);
+      background: var(--branco);
+    }
+
+    input::placeholder, textarea::placeholder { color: #bbb; }
+    textarea { height: 80px; resize: vertical; }
+
+    .field-row { display: flex; gap: 12px; }
+    .field-row .field { flex: 1; }
+
+    .btn-primary {
+      display: block; width: 100%;
+      padding: 14px 24px;
+      font-size: 12px; font-weight: 700;
+      font-family: "Montserrat", sans-serif;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      background: var(--preto); color: var(--branco);
+      border: none; border-radius: 2px;
+      cursor: pointer; margin-top: 0.75rem;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover { background: #333; }
+    .btn-primary:active { transform: scale(0.99); }
+
+    .error-msg { font-size: 13px; color: #c0392b; margin-top: 8px; display: none; }
+
+    /* LOADING */
+    .loader-wrap { text-align: center; padding: 1rem 0 2rem; }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 2px solid var(--borda);
+      border-top-color: var(--laranja);
+      border-radius: 50%;
+      margin: 0 auto 1.5rem;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loader-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 15px; font-weight: 700;
+      margin-bottom: 1.25rem; color: var(--preto);
+    }
+
+    .progress-steps { list-style: none; display: inline-block; text-align: left; }
+
+    .progress-steps li {
+      font-size: 13px; color: #ccc;
+      padding: 4px 0; display: flex;
+      align-items: center; gap: 10px; transition: color 0.3s;
+    }
+
+    .progress-steps li .dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--borda); flex-shrink: 0; transition: background 0.3s;
+    }
+
+    .progress-steps li.done { color: #aaa; }
+    .progress-steps li.done .dot { background: var(--laranja); }
+    .progress-steps li.active { color: var(--preto); font-weight: 600; }
+    .progress-steps li.active .dot { background: var(--preto); animation: pulse 1s infinite; }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .loader-note { font-size: 12px; color: #bbb; margin-top: 1.25rem; }
+
+    /* RESULTADO */
+    .score-area {
+      text-align: center; margin-bottom: 2.5rem;
+      padding-bottom: 2rem; border-bottom: 1px solid var(--borda);
+    }
+
+    .score-ring {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 5px solid var(--borda);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+    }
+
+    .score-num {
+      font-family: "Montserrat", sans-serif;
+      font-size: 30px; font-weight: 900; line-height: 1;
+    }
+
+    .score-max { font-size: 11px; color: #aaa; }
+
+    .score-label {
+      font-family: "Montserrat", sans-serif;
+      font-size: 15px; font-weight: 700; margin-bottom: 6px;
+    }
+
+    .score-sub { font-size: 13px; color: var(--cinza-texto); line-height: 1.6; max-width: 420px; margin: 0 auto; }
+
+    .geo-tag {
+      display: inline-block; font-size: 10px; padding: 3px 10px;
+      border-radius: 2px; background: var(--cinza-fundo);
+      color: #aaa; margin-top: 12px;
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+
+    .section-title {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #bbb;
+      margin: 2rem 0 0.75rem;
+    }
+
+    .dims { display: flex; flex-direction: column; gap: 12px; }
+
+    .dim-row { display: flex; align-items: center; font-size: 13px; gap: 12px; }
+    .dim-label { color: var(--cinza-texto); min-width: 110px; }
+    .dim-bar { flex: 1; height: 3px; background: var(--borda); }
+    .dim-fill { height: 100%; background: var(--laranja); transition: width 1s ease; }
+    .dim-val {
+      font-family: "Montserrat", sans-serif;
+      font-weight: 700; min-width: 28px;
+      text-align: right; font-size: 13px;
+    }
+
+    .block {
+      background: var(--cinza-fundo);
+      border-left: 3px solid var(--laranja);
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+      font-size: 14px; line-height: 1.75;
+      color: var(--cinza-texto);
+      white-space: pre-wrap;
+    }
+
+    .next-step {
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--borda);
+    }
+
+    .next-step:last-child { border-bottom: none; }
+
+    .next-step-num {
+      font-size: 10px; font-weight: 700;
+      color: var(--laranja); letter-spacing: 0.08em;
+      text-transform: uppercase; margin-bottom: 4px;
+    }
+
+    .next-step-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 14px; font-weight: 700;
+      margin-bottom: 6px; color: var(--preto);
+    }
+
+    .next-step-desc { font-size: 13px; color: var(--cinza-texto); line-height: 1.6; font-weight: 300; }
+
+    .cta-area {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      margin-top: 2rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--borda);
+    }
+
+    .btn-cta {
+      flex: 1; padding: 13px 20px;
+      font-size: 11px; font-weight: 700;
+      font-family: "Montserrat", sans-serif;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      border-radius: 2px; border: none; cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-cta-primary { background: var(--laranja); color: var(--branco); }
+    .btn-cta-primary:hover { background: #c96a18; }
+    .btn-cta-secondary { background: var(--cinza-fundo); color: var(--preto); border: 1px solid var(--borda); }
+    .btn-cta-secondary:hover { background: var(--borda); }
+
+    .footer {
+      text-align: center; margin-top: 2.5rem;
+      font-size: 11px; color: #bbb; letter-spacing: 0.03em;
+    }
+
+    .nota-metodologica {
+      font-size: 11px;
+      color: #bbb;
+      line-height: 1.6;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--borda);
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 22px; }
+      .card { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <span class="logo-text">Papa PPG</span>
+    <h1>Se um cliente perguntasse pra IA quem contratar no seu mercado… <em>sua empresa apareceria?</em></h1>
+    <p class="subtitle">Diagnóstico de visibilidade em IAs generativas como ChatGPT, Gemini e Perplexity — com score, análise e plano de ação.</p>
+  </div>
+
+  <!-- FORMULÁRIO ÚNICO -->
+  <div class="card step active" id="step-form">
+
+    <div class="section-divider">Seus dados</div>
+
+    <div class="field">
+      <label>Seu nome</label>
+      <input type="text" id="nome_contato" placeholder="Ex: Ana Silva" />
+    </div>
+    <div class="field">
+      <label>Seu e-mail</label>
+      <input type="email" id="email_contato" placeholder="Ex: ana@empresa.com.br" />
+    </div>
+
+    <div class="section-divider">Sobre a empresa</div>
+
+    <div class="field">
+      <label>Nome da empresa</label>
+      <input type="text" id="empresa" placeholder="Ex: O Boticário" />
+    </div>
+    <div class="field">
+      <label>Site <span class="opt">(opcional)</span></label>
+      <input type="text" id="site" placeholder="Ex: boticario.com.br" />
+    </div>
+    <div class="field">
+      <label>Segmento / mercado de atuação</label>
+      <input type="text" id="segmento" placeholder="Ex: cosméticos e perfumaria" />
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Cidade de atuação</label>
+        <input type="text" id="cidade" placeholder="Ex: São Paulo" />
+      </div>
+      <div class="field">
+        <label>Estado <span class="opt">(opcional)</span></label>
+        <input type="text" id="estado" placeholder="Ex: SP" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Abrangência geográfica</label>
+      <select id="abrangencia">
+        <option value="cidade">Somente a cidade informada</option>
+        <option value="regiao">Região (cidades próximas)</option>
+        <option value="estado">Estado inteiro</option>
+        <option value="nacional">Nacional</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Principais concorrentes <span class="opt">(opcional)</span></label>
+      <input type="text" id="concorrentes" placeholder="Ex: Concorrente A, Concorrente B" />
+    </div>
+    <div class="field">
+      <label>Observação adicional <span class="opt">(opcional)</span></label>
+      <textarea id="obs" placeholder="Ex: somos referência em atendimento B2B"></textarea>
+    </div>
+    <button class="btn-primary" onclick="startAnalysis()">Analisar presença na IA →</button>
+    <p class="error-msg" id="form-error">Preencha nome, e-mail, empresa, segmento e cidade.</p>
+  </div>
+
+  <!-- LOADING -->
+  <div class="card step" id="step-loading">
+    <div class="loader-wrap">
+      <div class="spinner"></div>
+      <p class="loader-title">Analisando sua marca na IA</p>
+      <ul class="progress-steps">
+        <li id="p1"><span class="dot"></span>Simulando perguntas de decisão</li>
+        <li id="p2"><span class="dot"></span>Analisando presença direta e indireta</li>
+        <li id="p3"><span class="dot"></span>Identificando quem domina no seu segmento</li>
+        <li id="p4"><span class="dot"></span>Cruzando dimensões de autoridade</li>
+        <li id="p5"><span class="dot"></span>Montando diagnóstico final</li>
+      </ul>
+      <p class="loader-note">Isso pode levar até 30 segundos</p>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="step" id="step-result">
+    <div class="card">
+      <div class="score-area">
+        <div class="score-ring" id="score-ring">
+          <span class="score-num" id="score-val">—</span>
+          <span class="score-max">/100</span>
+        </div>
+        <p class="score-label" id="score-label"></p>
+        <p class="score-sub" id="score-sub"></p>
+        <span class="geo-tag" id="geo-tag"></span>
+      </div>
+
+      <p class="section-title">Dimensões de presença</p>
+      <div class="dims">
+        <div class="dim-row">
+          <span class="dim-label">Autoridade</span>
+          <div class="dim-bar"><div class="dim-fill" id="bar-autoridade" style="width:0%"></div></div>
+          <span class="dim-val" id="val-autoridade">—</span>
+        </div>
+        <div class="dim-row">
+          <span class="dim-label">Cobertura</span>
+          <div class="dim-bar"><div class="dim-fill" id="bar-cobertura" style="width:0%"></div></div>
+          <span class="dim-val" id="val-cobertura">—</span>
+        </div>
+        <div class="dim-row">
+          <span class="dim-label">Posicionamento</span>
+          <div class="dim-bar"><div class="dim-fill" id="bar-posicionamento" style="width:0%"></div></div>
+          <span class="dim-val" id="val-posicionamento">—</span>
+        </div>
+      </div>
+
+      <p class="section-title">Diagnóstico</p>
+      <div class="block" id="txt-diagnostico"></div>
+
+      <p class="section-title">O que a IA responde sobre seu segmento</p>
+      <div class="block" id="txt-perguntas"></div>
+
+      <p class="section-title">Quem está dominando</p>
+      <div class="block" id="txt-dominando"></div>
+
+      <p class="section-title">Onde você deveria aparecer (e não aparece)</p>
+      <div class="block" id="txt-gaps"></div>
+
+      <p class="section-title">O que fazer agora</p>
+      <div id="next-steps"></div>
+
+      <div class="nota-metodologica" id="nota-metodologica"></div>
+
+      <div class="cta-area">
+        <button class="btn-cta btn-cta-secondary" onclick="restart()">Nova análise</button>
+        <button class="btn-cta btn-cta-primary" onclick="window.location.href='mailto:contato@papa.ppg.br?subject=Quero um plano de ação completo'">Quero um plano de ação →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Desenvolvido por Papa PPG · Estratégia de conteúdo e presença na era da IA</div>
+</div>
+
+<script>
+let progressTimer;
+
+function advanceProgress(step) {
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById("p" + i);
+    el.classList.remove("active", "done");
+    if (i < step) el.classList.add("done");
+    else if (i === step) el.classList.add("active");
   }
 }
+
+async function notificarFormspree(dados) {
+  try {
+    await fetch("https://formspree.io/f/mwvzlbeo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        nome: dados.nome,
+        email: dados.email,
+        empresa: dados.empresa,
+        segmento: dados.segmento,
+        cidade: dados.cidade + (dados.estado ? ", " + dados.estado : ""),
+        abrangencia: dados.abrangencia,
+        _subject: "Novo Raio-X: " + dados.empresa + " (" + dados.cidade + ")"
+      })
+    });
+  } catch(e) {
+    console.log("Formspree erro (não crítico):", e);
+  }
+}
+
+async function startAnalysis() {
+  const nome_contato  = document.getElementById("nome_contato").value.trim();
+  const email_contato = document.getElementById("email_contato").value.trim();
+  const empresa       = document.getElementById("empresa").value.trim();
+  const segmento      = document.getElementById("segmento").value.trim();
+  const cidade        = document.getElementById("cidade").value.trim();
+
+  if (!nome_contato || !email_contato || !empresa || !segmento || !cidade) {
+    document.getElementById("form-error").style.display = "block";
+    return;
+  }
+  document.getElementById("form-error").style.display = "none";
+  showStep("step-loading");
+
+  let step = 1;
+  advanceProgress(step);
+  progressTimer = setInterval(() => {
+    step++;
+    if (step <= 5) advanceProgress(step);
+  }, 5000);
+
+  const estado      = document.getElementById("estado").value.trim();
+  const abrangencia = document.getElementById("abrangencia").value;
+
+  // Envia para Formspree em paralelo — não bloqueia a análise
+  notificarFormspree({ nome: nome_contato, email: email_contato, empresa, segmento, cidade, estado, abrangencia });
+
+  fetch("/api/analisar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      empresa,
+      site:         document.getElementById("site").value.trim(),
+      segmento,
+      cidade,
+      estado,
+      abrangencia,
+      concorrentes: document.getElementById("concorrentes").value.trim(),
+      obs:          document.getElementById("obs").value.trim(),
+      nome_contato,
+      email_contato
+    })
+  })
+  .then(r => r.json())
+  .then(result => {
+    clearInterval(progressTimer);
+    if (result.error) throw new Error(result.error);
+    renderResult(result);
+  })
+  .catch(() => {
+    clearInterval(progressTimer);
+    showStep("step-form");
+    const err = document.getElementById("form-error");
+    err.textContent = "Erro na análise. Tente novamente em alguns segundos.";
+    err.style.display = "block";
+  });
+}
+
+function renderResult(r) {
+  const score = Math.round(r.score || 0);
+  document.getElementById("score-val").textContent = score;
+  document.getElementById("score-label").textContent = r.scoreLabel || "";
+  document.getElementById("score-sub").textContent = r.scoreSub || "";
+  document.getElementById("geo-tag").textContent = "Recorte: " + (r.geo || "");
+
+  const ring = document.getElementById("score-ring");
+  ring.style.borderColor = score < 35 ? "#c0392b" : score < 65 ? "#e07820" : "#27ae60";
+
+  const d = r.dimensoes || {};
+  ["autoridade","cobertura","posicionamento"].forEach(k => {
+    const v = Math.round(d[k] || 0);
+    document.getElementById("bar-" + k).style.width = v + "%";
+    document.getElementById("val-" + k).textContent = v;
+  });
+
+  document.getElementById("txt-diagnostico").textContent = r.diagnostico || "";
+  document.getElementById("txt-perguntas").textContent = r.perguntasSimuladas || "";
+  document.getElementById("txt-dominando").textContent = r.quemDomina || "";
+
+  const gaps = r.gaps;
+  if (Array.isArray(gaps)) {
+    document.getElementById("txt-gaps").textContent = gaps.map((g, i) =>
+      typeof g === "object" ? (i+1) + ". " + (g.titulo||"") + ": " + (g.descricao||"") : g
+    ).join("\n\n");
+  } else {
+    document.getElementById("txt-gaps").textContent = gaps || "";
+  }
+
+  document.getElementById("next-steps").innerHTML = (r.proximosPassos || []).map((s, i) => {
+    const titulo = typeof s === "object" ? (s.titulo || "") : s;
+    const desc   = typeof s === "object" ? (s.descricao || "") : "";
+    return "<div class=\"next-step\">" +
+      "<div class=\"next-step-num\">→ Passo 0" + (i+1) + "</div>" +
+      "<div class=\"next-step-title\">" + titulo + "</div>" +
+      (desc ? "<div class=\"next-step-desc\">" + desc + "</div>" : "") +
+      "</div>";
+  }).join("");
+
+
+  document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function restart() {
+  showStep("step-form");
+}
+</script>
+</body>
+</html>
