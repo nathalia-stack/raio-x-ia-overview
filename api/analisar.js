@@ -27,6 +27,7 @@ export default async function handler(req, res) {
     nacional: 'todo o Brasil'
   }[abrangencia] || `a cidade de ${cidade}`;
 
+  // Notificação via Formspree — não bloqueia a análise
   async function notificarFormspree() {
     try {
       await fetch('https://formspree.io/f/mwvzlbeo', {
@@ -63,52 +64,31 @@ DADOS DA EMPRESA:
 INSTRUÇÕES:
 1. Use web search para buscar informações REAIS sobre esta empresa. Faça as seguintes buscas:
    - "${empresa} ${cidade}" — presença geral
-   - "${empresa} avaliação OR review OR reclamação" — reputação pública
+   - "${empresa} site:reclameaqui.com.br" — reputação
+   - "${empresa} avaliação OR review OR reclamação" — o que clientes dizem
    - "melhores empresas ${segmento} ${geo}" — quem aparece no lugar dela
    - "${empresa} ${segmento}" — autoridade no segmento
-   - "${segmento} ${geo}" — panorama geral da categoria
 
 2. Com base no que ENCONTROU de verdade (não simule), avalie:
    - A empresa tem site ativo e bem estruturado?
    - Aparece em diretórios, portais, notícias locais?
    - Tem avaliações em plataformas públicas?
    - Produz conteúdo relevante para o segmento?
-   - Concorrentes aparecem mais do que ela nas buscas genéricas do segmento?
+   - Concorrentes aparecem mais do que ela nas buscas?
 
-3. REGRAS CRÍTICAS para os gaps e diagnóstico:
-   - NÃO afirme que a empresa "não tem Google Meu Negócio" ou "não está em diretórios" apenas porque não apareceu em buscas genéricas. Google Meu Negócio não é indexado em buscas textuais — sua ausência nos resultados de busca NÃO significa que o perfil não existe.
-   - O gap real é: a empresa não aparece em buscas genéricas sobre o segmento, não que ela não tem cadastros. Formule os gaps com essa precisão.
-   - Foque nos gaps de VISIBILIDADE (não aparecer quando buscam pelo segmento) e de AUTORIDADE (poucos terceiros falando da marca), não em suposições sobre cadastros que você não verificou.
+3. Avalie nas 3 dimensões (0-100) com critério realista:
+   - Autoridade (peso 40%): 0-20 = nunca citada; 21-40 = raramente; 41-60 = às vezes em buscas genéricas; 61-80 = frequente; 81-100 = referência do segmento
+   - Cobertura (peso 30%): 0-20 = ausente em todas as perguntas; 21-50 = aparece em 1 pergunta; 51-75 = aparece em 2-3; 76-100 = presente em todas
+   - Posicionamento (peso 30%): 0-30 = mercado não reconhecido pela IA; 31-60 = mercado existe mas empresa não está posicionada; 61-80 = posicionada mas genérica; 81-100 = posicionamento claro e diferenciado
 
-4. Avalie nas 3 dimensões (0-100) com critério realista:
+4. Score = (autoridade * 0.4) + (cobertura * 0.3) + (posicionamento * 0.3)
 
-   Autoridade (peso 40%):
-   - 0-20 = nunca citada, sem presença digital verificável
-   - 21-40 = raramente citada, presença mínima
-   - 41-60 = às vezes aparece em buscas, site ativo com algum conteúdo
-   - 61-80 = citada frequentemente, boa presença em múltiplos canais
-   - 81-100 = referência clara do segmento, citada amplamente
-
-   Cobertura (peso 30%):
-   - 0-20 = ausente em todas as buscas do segmento
-   - 21-50 = aparece em 1 tipo de busca
-   - 51-75 = aparece em 2-3 tipos de busca
-   - 76-100 = presente em todos os tipos de busca relevantes
-
-   Posicionamento (peso 30%):
-   - 0-30 = não identificável como referência no segmento
-   - 31-60 = existe mas não se diferencia
-   - 61-80 = alguma diferenciação percebida
-   - 81-100 = posicionamento claro e diferenciado
-
-5. Score = (autoridade * 0.4) + (cobertura * 0.3) + (posicionamento * 0.3)
-
-REFERÊNCIA DE SCORES — use para calibrar:
-- 0-25: empresa invisível, sem presença digital relevante para IAs
+Referência de scores:
+- 0-25: empresa invisível, sem presença digital relevante
 - 26-45: presença mínima, aparece em poucos contextos
-- 46-65: presença moderada, reconhecida em algumas buscas — empresa com site ativo e algum conteúdo deve ficar nessa faixa
-- 66-80: boa presença, aparece consistentemente em buscas do segmento
-- 81-100: referência do segmento nas IAs
+- 46-65: presença moderada, reconhecida em algumas buscas
+- 66-80: boa presença, aparece consistentemente
+- 81-100: referência do segmento na IA
 
 Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de código:
 {
@@ -119,11 +99,11 @@ Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de códi
   "diagnostico": "2-3 frases baseadas no que foi encontrado de verdade nas buscas. Mencione evidências reais. Mencione a empresa pelo nome e o recorte de ${geo}.",
   "perguntasSimuladas": "Com base nas buscas realizadas, descreva em texto corrido o que uma IA generativa responderia sobre ${segmento} em ${geo} e se ${empresa} apareceria ou não. Máximo 4 parágrafos.",
   "quemDomina": "Com base nas buscas, quem realmente aparece quando se busca ${segmento} em ${geo}. Seja específico sobre o que foi encontrado.",
-  "gaps": "3-4 lacunas de VISIBILIDADE concretas — foque em onde a empresa não aparece nas buscas e por quê, não em suposições sobre cadastros não verificados.",
+  "gaps": "3-4 lacunas concretas identificadas nas buscas — o que está faltando na presença digital de ${empresa}.",
   "proximosPassos": [
-    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas de visibilidade encontradas"},
-    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas de visibilidade encontradas"},
-    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas de visibilidade encontradas"}
+    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"},
+    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"},
+    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"}
   ]
 }`;
 
@@ -136,7 +116,7 @@ Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de códi
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 3000,
         temperature: 0,
         tools: [{
