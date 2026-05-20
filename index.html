@@ -138,7 +138,6 @@
 
     .error-msg { font-size: 13px; color: #c0392b; margin-top: 8px; display: none; }
 
-    /* LOADING */
     .loader-wrap { text-align: center; padding: 1rem 0 2rem; }
 
     .spinner {
@@ -180,7 +179,6 @@
 
     .loader-note { font-size: 12px; color: #bbb; margin-top: 1.25rem; }
 
-    /* RESULTADO */
     .score-area {
       text-align: center; margin-bottom: 2.5rem;
       padding-bottom: 2rem; border-bottom: 1px solid var(--borda);
@@ -264,10 +262,18 @@
 
     .next-step-desc { font-size: 13px; color: var(--cinza-texto); line-height: 1.6; font-weight: 300; }
 
+    .nota-metodologica {
+      font-size: 11px;
+      color: #bbb;
+      line-height: 1.6;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--borda);
+    }
+
     .cta-area {
       display: flex; gap: 10px; flex-wrap: wrap;
-      margin-top: 2rem; padding-top: 1.5rem;
-      border-top: 1px solid var(--borda);
+      margin-top: 1.5rem;
     }
 
     .btn-cta {
@@ -289,15 +295,6 @@
       font-size: 11px; color: #bbb; letter-spacing: 0.03em;
     }
 
-    .nota-metodologica {
-      font-size: 11px;
-      color: #bbb;
-      line-height: 1.6;
-      margin-top: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--borda);
-    }
-
     @media (max-width: 480px) {
       h1 { font-size: 22px; }
       .card { padding: 1.5rem; }
@@ -313,11 +310,8 @@
     <p class="subtitle">Diagnóstico de visibilidade em IAs generativas como ChatGPT, Gemini e Perplexity — com score, análise e plano de ação.</p>
   </div>
 
-  <!-- FORMULÁRIO ÚNICO -->
   <div class="card step active" id="step-form">
-
     <div class="section-divider">Seus dados</div>
-
     <div class="field">
       <label>Seu nome</label>
       <input type="text" id="nome_contato" placeholder="Ex: Ana Silva" />
@@ -328,7 +322,6 @@
     </div>
 
     <div class="section-divider">Sobre a empresa</div>
-
     <div class="field">
       <label>Nome da empresa</label>
       <input type="text" id="empresa" placeholder="Ex: O Boticário" />
@@ -372,7 +365,6 @@
     <p class="error-msg" id="form-error">Preencha nome, e-mail, empresa, segmento e cidade.</p>
   </div>
 
-  <!-- LOADING -->
   <div class="card step" id="step-loading">
     <div class="loader-wrap">
       <div class="spinner"></div>
@@ -388,7 +380,6 @@
     </div>
   </div>
 
-  <!-- RESULTADO -->
   <div class="step" id="step-result">
     <div class="card">
       <div class="score-area">
@@ -448,11 +439,11 @@
 </div>
 
 <script>
-let progressTimer;
+var progressTimer;
 
 function advanceProgress(step) {
-  for (let i = 1; i <= 5; i++) {
-    const el = document.getElementById("p" + i);
+  for (var i = 1; i <= 5; i++) {
+    var el = document.getElementById("p" + i);
     el.classList.remove("active", "done");
     if (i < step) el.classList.add("done");
     else if (i === step) el.classList.add("active");
@@ -469,22 +460,21 @@ async function notificarFormspree(dados) {
         email: dados.email,
         empresa: dados.empresa,
         segmento: dados.segmento,
-        cidade: dados.cidade + (dados.estado ? ", " + dados.estado : ""),
-        abrangencia: dados.abrangencia,
-        _subject: "Novo Raio-X: " + dados.empresa + " (" + dados.cidade + ")"
+        cidade: dados.cidade,
+        _subject: "Novo Raio-X: " + dados.empresa
       })
     });
   } catch(e) {
-    console.log("Formspree erro (não crítico):", e);
+    console.log("Formspree erro:", e);
   }
 }
 
 async function startAnalysis() {
-  const nome_contato  = document.getElementById("nome_contato").value.trim();
-  const email_contato = document.getElementById("email_contato").value.trim();
-  const empresa       = document.getElementById("empresa").value.trim();
-  const segmento      = document.getElementById("segmento").value.trim();
-  const cidade        = document.getElementById("cidade").value.trim();
+  var nome_contato  = document.getElementById("nome_contato").value.trim();
+  var email_contato = document.getElementById("email_contato").value.trim();
+  var empresa       = document.getElementById("empresa").value.trim();
+  var segmento      = document.getElementById("segmento").value.trim();
+  var cidade        = document.getElementById("cidade").value.trim();
 
   if (!nome_contato || !email_contato || !empresa || !segmento || !cidade) {
     document.getElementById("form-error").style.display = "block";
@@ -493,63 +483,68 @@ async function startAnalysis() {
   document.getElementById("form-error").style.display = "none";
   showStep("step-loading");
 
-  let step = 1;
+  var step = 1;
   advanceProgress(step);
-  progressTimer = setInterval(() => {
+  progressTimer = setInterval(function() {
     step++;
     if (step <= 5) advanceProgress(step);
   }, 5000);
 
-  const estado      = document.getElementById("estado").value.trim();
-  const abrangencia = document.getElementById("abrangencia").value;
+  var estado      = document.getElementById("estado").value.trim();
+  var abrangencia = document.getElementById("abrangencia").value;
 
-  // Envia para Formspree em paralelo — não bloqueia a análise
-  notificarFormspree({ nome: nome_contato, email: email_contato, empresa, segmento, cidade, estado, abrangencia });
+  notificarFormspree({
+    nome: nome_contato,
+    email: email_contato,
+    empresa: empresa,
+    segmento: segmento,
+    cidade: cidade + (estado ? ", " + estado : "")
+  });
 
   fetch("/api/analisar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      empresa,
-      site:         document.getElementById("site").value.trim(),
-      segmento,
-      cidade,
-      estado,
-      abrangencia,
+      empresa: empresa,
+      site: document.getElementById("site").value.trim(),
+      segmento: segmento,
+      cidade: cidade,
+      estado: estado,
+      abrangencia: abrangencia,
       concorrentes: document.getElementById("concorrentes").value.trim(),
-      obs:          document.getElementById("obs").value.trim(),
-      nome_contato,
-      email_contato
+      obs: document.getElementById("obs").value.trim(),
+      nome_contato: nome_contato,
+      email_contato: email_contato
     })
   })
-  .then(r => r.json())
-  .then(result => {
+  .then(function(r) { return r.json(); })
+  .then(function(result) {
     clearInterval(progressTimer);
     if (result.error) throw new Error(result.error);
     renderResult(result);
   })
-  .catch(() => {
+  .catch(function() {
     clearInterval(progressTimer);
     showStep("step-form");
-    const err = document.getElementById("form-error");
+    var err = document.getElementById("form-error");
     err.textContent = "Erro na análise. Tente novamente em alguns segundos.";
     err.style.display = "block";
   });
 }
 
 function renderResult(r) {
-  const score = Math.round(r.score || 0);
+  var score = Math.round(r.score || 0);
   document.getElementById("score-val").textContent = score;
   document.getElementById("score-label").textContent = r.scoreLabel || "";
   document.getElementById("score-sub").textContent = r.scoreSub || "";
   document.getElementById("geo-tag").textContent = "Recorte: " + (r.geo || "");
 
-  const ring = document.getElementById("score-ring");
+  var ring = document.getElementById("score-ring");
   ring.style.borderColor = score < 35 ? "#c0392b" : score < 65 ? "#e07820" : "#27ae60";
 
-  const d = r.dimensoes || {};
-  ["autoridade","cobertura","posicionamento"].forEach(k => {
-    const v = Math.round(d[k] || 0);
+  var d = r.dimensoes || {};
+  ["autoridade","cobertura","posicionamento"].forEach(function(k) {
+    var v = Math.round(d[k] || 0);
     document.getElementById("bar-" + k).style.width = v + "%";
     document.getElementById("val-" + k).textContent = v;
   });
@@ -558,27 +553,38 @@ function renderResult(r) {
   document.getElementById("txt-perguntas").textContent = r.perguntasSimuladas || "";
   document.getElementById("txt-dominando").textContent = r.quemDomina || "";
 
-  const gaps = r.gaps;
+  var gaps = r.gaps;
   if (Array.isArray(gaps)) {
-    document.getElementById("txt-gaps").textContent = gaps.map((g, i) =>
-      typeof g === "object" ? (i+1) + ". " + (g.titulo||"") + ": " + (g.descricao||"") : g
-    ).join("\n\n");
+    document.getElementById("txt-gaps").textContent = gaps.map(function(g, i) {
+      return typeof g === "object" ? (i+1) + ". " + (g.titulo||"") + ": " + (g.descricao||"") : g;
+    }).join("
+
+");
   } else {
     document.getElementById("txt-gaps").textContent = gaps || "";
   }
 
-  document.getElementById("next-steps").innerHTML = (r.proximosPassos || []).map((s, i) => {
-    const titulo = typeof s === "object" ? (s.titulo || "") : s;
-    const desc   = typeof s === "object" ? (s.descricao || "") : "";
-    return "<div class=\"next-step\">" +
-      "<div class=\"next-step-num\">→ Passo 0" + (i+1) + "</div>" +
-      "<div class=\"next-step-title\">" + titulo + "</div>" +
-      (desc ? "<div class=\"next-step-desc\">" + desc + "</div>" : "") +
-      "</div>";
+  var nextSteps = r.proximosPassos || [];
+  document.getElementById("next-steps").innerHTML = nextSteps.map(function(s, i) {
+    var titulo = typeof s === "object" ? (s.titulo || "") : s;
+    var desc = typeof s === "object" ? (s.descricao || "") : "";
+    return '<div class="next-step">' +
+      '<div class="next-step-num">→ Passo 0' + (i+1) + '</div>' +
+      '<div class="next-step-title">' + titulo + '</div>' +
+      (desc ? '<div class="next-step-desc">' + desc + '</div>' : '') +
+      '</div>';
   }).join("");
 
+  var nota = document.getElementById("nota-metodologica");
+  if (nota) {
+    nota.textContent = r.notaMetodologica || "Diagnóstico baseado em evidências de indexação pública. Canais como Google Meu Negócio e LinkedIn existem mas podem não aparecer em buscas textuais — o score reflete visibilidade em conteúdo indexado publicamente.";
+  }
 
-  document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+  showStep("step-result");
+}
+
+function showStep(id) {
+  document.querySelectorAll(".step").forEach(function(s) { s.classList.remove("active"); });
   document.getElementById(id).classList.add("active");
 }
 
