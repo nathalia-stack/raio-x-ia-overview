@@ -50,10 +50,7 @@
       color: var(--preto);
     }
 
-    h1 em {
-      font-style: normal;
-      color: var(--laranja);
-    }
+    h1 em { font-style: normal; color: var(--laranja); }
 
     .subtitle {
       font-size: 15px;
@@ -72,6 +69,19 @@
 
     .step { display: none; }
     .step.active { display: block; }
+
+    .section-divider {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #bbb;
+      margin: 1.75rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--borda);
+    }
+
+    .section-divider:first-child { margin-top: 0; }
 
     .field { margin-bottom: 1.25rem; }
 
@@ -128,6 +138,7 @@
 
     .error-msg { font-size: 13px; color: #c0392b; margin-top: 8px; display: none; }
 
+    /* LOADING */
     .loader-wrap { text-align: center; padding: 1rem 0 2rem; }
 
     .spinner {
@@ -169,6 +180,7 @@
 
     .loader-note { font-size: 12px; color: #bbb; margin-top: 1.25rem; }
 
+    /* RESULTADO */
     .score-area {
       text-align: center; margin-bottom: 2.5rem;
       padding-bottom: 2rem; border-bottom: 1px solid var(--borda);
@@ -277,30 +289,6 @@
       font-size: 11px; color: #bbb; letter-spacing: 0.03em;
     }
 
-    .form-intro {
-      font-size: 14px;
-      color: var(--cinza-texto);
-      margin-bottom: 1.25rem;
-      line-height: 1.6;
-    }
-
-    /* Ajustes visuais no formulário do RD para combinar com o layout */
-    #raio-x-papa-ppg-e8de34a90f67484a4fe4 input,
-    #raio-x-papa-ppg-e8de34a90f67484a4fe4 select {
-      border-radius: 2px !important;
-      font-family: "Open Sans", sans-serif !important;
-    }
-
-    #raio-x-papa-ppg-e8de34a90f67484a4fe4 button,
-    #raio-x-papa-ppg-e8de34a90f67484a4fe4 input[type=submit] {
-      background: var(--laranja) !important;
-      border-radius: 2px !important;
-      font-family: "Montserrat", sans-serif !important;
-      font-weight: 700 !important;
-      letter-spacing: 0.06em !important;
-      text-transform: uppercase !important;
-    }
-
     @media (max-width: 480px) {
       h1 { font-size: 22px; }
       .card { padding: 1.5rem; }
@@ -316,34 +304,22 @@
     <p class="subtitle">Diagnóstico de visibilidade em IAs generativas como ChatGPT, Gemini e Perplexity — com score, análise e plano de ação.</p>
   </div>
 
-  <!-- STEP 1: Formulário RD Station — captura nome/email/empresa -->
-  <div class="card step active" id="step-rd">
-    <p class="form-intro">Preencha seus dados para acessar o diagnóstico gratuito.</p>
-    <div role="main" id="raio-x-papa-ppg-e8de34a90f67484a4fe4"></div>
-    <script type="text/javascript" src="https://d335luupugsy2.cloudfront.net/js/rdstation-forms/stable/rdstation-forms.min.js"></script>
-    <script type="text/javascript">
-      new RDStationForms('raio-x-papa-ppg-e8de34a90f67484a4fe4', 'null').createForm();
-      // Aguarda submit do formulário RD e avança para a análise
-      // Observa quando a mensagem de obrigado do RD aparecer e avança para a análise
-      var rdObserver = new MutationObserver(function() {
-        var confirmacao = document.querySelector(
-          '#raio-x-papa-ppg-e8de34a90f67484a4fe4 .thankyou-page, ' +
-          '#raio-x-papa-ppg-e8de34a90f67484a4fe4 [class*="thank"], ' +
-          '#raio-x-papa-ppg-e8de34a90f67484a4fe4 [class*="success"], ' +
-          '#raio-x-papa-ppg-e8de34a90f67484a4fe4 [class*="obrigado"], ' +
-          '#raio-x-papa-ppg-e8de34a90f67484a4fe4 .rd-thank-you-page'
-        );
-        if (confirmacao && confirmacao.offsetParent !== null) {
-          rdObserver.disconnect();
-          setTimeout(function() { showStep('step-form'); }, 1500);
-        }
-      });
-      rdObserver.observe(document.body, { childList: true, subtree: true });
-    </script>
-  </div>
+  <!-- FORMULÁRIO ÚNICO -->
+  <div class="card step active" id="step-form">
 
-  <!-- STEP 2: Dados da empresa para análise -->
-  <div class="card step" id="step-form">
+    <div class="section-divider">Seus dados</div>
+
+    <div class="field">
+      <label>Seu nome</label>
+      <input type="text" id="nome_contato" placeholder="Ex: Ana Silva" />
+    </div>
+    <div class="field">
+      <label>Seu e-mail</label>
+      <input type="email" id="email_contato" placeholder="Ex: ana@empresa.com.br" />
+    </div>
+
+    <div class="section-divider">Sobre a empresa</div>
+
     <div class="field">
       <label>Nome da empresa</label>
       <input type="text" id="empresa" placeholder="Ex: O Boticário" />
@@ -384,9 +360,10 @@
       <textarea id="obs" placeholder="Ex: somos referência em atendimento B2B"></textarea>
     </div>
     <button class="btn-primary" onclick="startAnalysis()">Analisar presença na IA →</button>
-    <p class="error-msg" id="form-error">Preencha pelo menos nome da empresa, segmento e cidade.</p>
+    <p class="error-msg" id="form-error">Preencha nome, e-mail, empresa, segmento e cidade.</p>
   </div>
 
+  <!-- LOADING -->
   <div class="card step" id="step-loading">
     <div class="loader-wrap">
       <div class="spinner"></div>
@@ -402,6 +379,7 @@
     </div>
   </div>
 
+  <!-- RESULTADO -->
   <div class="step" id="step-result">
     <div class="card">
       <div class="score-area">
@@ -470,16 +448,40 @@ function advanceProgress(step) {
   }
 }
 
-function startAnalysis() {
-  const empresa = document.getElementById("empresa").value.trim();
-  const segmento = document.getElementById("segmento").value.trim();
-  const cidade = document.getElementById("cidade").value.trim();
-  if (!empresa || !segmento || !cidade) {
+async function notificarFormspree(dados) {
+  try {
+    await fetch("https://formspree.io/f/mwvzlbeo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        nome: dados.nome,
+        email: dados.email,
+        empresa: dados.empresa,
+        segmento: dados.segmento,
+        cidade: dados.cidade + (dados.estado ? ", " + dados.estado : ""),
+        abrangencia: dados.abrangencia,
+        _subject: "Novo Raio-X: " + dados.empresa + " (" + dados.cidade + ")"
+      })
+    });
+  } catch(e) {
+    console.log("Formspree erro (não crítico):", e);
+  }
+}
+
+async function startAnalysis() {
+  const nome_contato  = document.getElementById("nome_contato").value.trim();
+  const email_contato = document.getElementById("email_contato").value.trim();
+  const empresa       = document.getElementById("empresa").value.trim();
+  const segmento      = document.getElementById("segmento").value.trim();
+  const cidade        = document.getElementById("cidade").value.trim();
+
+  if (!nome_contato || !email_contato || !empresa || !segmento || !cidade) {
     document.getElementById("form-error").style.display = "block";
     return;
   }
   document.getElementById("form-error").style.display = "none";
   showStep("step-loading");
+
   let step = 1;
   advanceProgress(step);
   progressTimer = setInterval(() => {
@@ -487,18 +489,26 @@ function startAnalysis() {
     if (step <= 5) advanceProgress(step);
   }, 5000);
 
+  const estado      = document.getElementById("estado").value.trim();
+  const abrangencia = document.getElementById("abrangencia").value;
+
+  // Envia para Formspree em paralelo — não bloqueia a análise
+  notificarFormspree({ nome: nome_contato, email: email_contato, empresa, segmento, cidade, estado, abrangencia });
+
   fetch("/api/analisar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       empresa,
-      site: document.getElementById("site").value.trim(),
+      site:         document.getElementById("site").value.trim(),
       segmento,
       cidade,
-      estado: document.getElementById("estado").value.trim(),
-      abrangencia: document.getElementById("abrangencia").value,
+      estado,
+      abrangencia,
       concorrentes: document.getElementById("concorrentes").value.trim(),
-      obs: document.getElementById("obs").value.trim()
+      obs:          document.getElementById("obs").value.trim(),
+      nome_contato,
+      email_contato
     })
   })
   .then(r => r.json())
@@ -548,7 +558,7 @@ function renderResult(r) {
 
   document.getElementById("next-steps").innerHTML = (r.proximosPassos || []).map((s, i) => {
     const titulo = typeof s === "object" ? (s.titulo || "") : s;
-    const desc = typeof s === "object" ? (s.descricao || "") : "";
+    const desc   = typeof s === "object" ? (s.descricao || "") : "";
     return "<div class=\"next-step\">" +
       "<div class=\"next-step-num\">→ Passo 0" + (i+1) + "</div>" +
       "<div class=\"next-step-title\">" + titulo + "</div>" +
