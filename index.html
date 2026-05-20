@@ -324,17 +324,21 @@
     <script type="text/javascript">
       new RDStationForms('raio-x-papa-ppg-e8de34a90f67484a4fe4', 'null').createForm();
       // Aguarda submit do formulário RD e avança para a análise
-      document.addEventListener('DOMContentLoaded', function() {
-        var checkRD = setInterval(function() {
-          var btn = document.querySelector('#raio-x-papa-ppg-e8de34a90f67484a4fe4 button[type=submit], #raio-x-papa-ppg-e8de34a90f67484a4fe4 input[type=submit]');
-          if (btn) {
-            clearInterval(checkRD);
-            btn.addEventListener('click', function() {
-              setTimeout(function() { showStep('step-form'); }, 800);
-            });
-          }
-        }, 300);
+      // Observa quando a mensagem de obrigado do RD aparecer e avança para a análise
+      var rdObserver = new MutationObserver(function() {
+        var confirmacao = document.querySelector(
+          '#raio-x-papa-ppg-e8de34a90f67484a4fe4 .thankyou-page, ' +
+          '#raio-x-papa-ppg-e8de34a90f67484a4fe4 [class*="thank"], ' +
+          '#raio-x-papa-ppg-e8de34a90f67484a4fe4 [class*="success"], ' +
+          '#raio-x-papa-ppg-e8de34a90f67484a4fe4 [class*="obrigado"], ' +
+          '#raio-x-papa-ppg-e8de34a90f67484a4fe4 .rd-thank-you-page'
+        );
+        if (confirmacao && confirmacao.offsetParent !== null) {
+          rdObserver.disconnect();
+          setTimeout(function() { showStep('step-form'); }, 1500);
+        }
       });
+      rdObserver.observe(document.body, { childList: true, subtree: true });
     </script>
   </div>
 
