@@ -134,9 +134,8 @@ async function sendNotification(data) {
         'Authorization': `Bearer ${RESEND_KEY}`
       },
       body: JSON.stringify({
-        // PLACEHOLDER: substitua pelo seu email verificado no Resend
-        from: 'raio-x@papappg.com.br',
-        to: 'nathalia@papappg.com.br', // PLACEHOLDER: seu email
+        from: 'onboarding@resend.dev',
+        to: process.env.NOTIFY_EMAIL || 'seuemail@gmail.com', // PLACEHOLDER: seu Gmail
         subject: `🔍 Novo Raio-X: ${empresa} (score ${score}/100)`,
         html: `
           <h2>Novo diagnóstico realizado</h2>
