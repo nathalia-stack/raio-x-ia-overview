@@ -62,46 +62,49 @@ DADOS DA EMPRESA:
 - Observações: ${obs || 'nenhuma'}
 
 INSTRUÇÕES:
-1. Use web search para buscar informações REAIS sobre esta empresa. Faça TODAS as seguintes buscas antes de avaliar:
+1. Use web search para buscar informações REAIS sobre esta empresa. Faça as seguintes buscas:
    - "${empresa} ${cidade}" — presença geral
    - "${empresa} avaliação OR review OR reclamação" — reputação pública
    - "melhores empresas ${segmento} ${geo}" — quem aparece no lugar dela
    - "${empresa} ${segmento}" — autoridade no segmento
-   - "${empresa} Google Meu Negócio OR Econodata OR oHub OR Clutch OR LinkedIn" — presença em diretórios e redes profissionais
    - "${segmento} ${geo}" — panorama geral da categoria
 
-2. ATENÇÃO CRÍTICA — antes de afirmar que a empresa não aparece em diretórios:
-   - Você DEVE buscar explicitamente pelo nome da empresa em diretórios como Google Meu Negócio, Econodata, oHub, LinkedIn, BuscaJá
-   - Só afirme ausência se realmente não encontrou nada nas buscas
-   - Se encontrou presença em algum diretório, mencione qual e com que nível de completude
-   - Não confunda "não aparece em buscas genéricas do segmento" com "não está em diretórios"
-
-3. Com base no que ENCONTROU de verdade (não simule), avalie:
+2. Com base no que ENCONTROU de verdade (não simule), avalie:
    - A empresa tem site ativo e bem estruturado?
-   - Aparece em diretórios, portais, notícias locais? (busque ativamente antes de responder)
+   - Aparece em diretórios, portais, notícias locais?
    - Tem avaliações em plataformas públicas?
    - Produz conteúdo relevante para o segmento?
-   - Concorrentes aparecem mais do que ela nas buscas genéricas do segmento?
+   - Concorrentes aparecem mais do que ela nas buscas?
 
-4. Avalie nas 3 dimensões (0-100) com base nas evidências encontradas:
-   - Autoridade (peso 40%):
-     * 0-20 = sem presença digital verificável
-     * 21-40 = presença mínima (só site institucional básico)
-     * 41-60 = presença moderada (site + algumas menções e diretórios)
-     * 61-80 = boa presença (conteúdo, avaliações, diretórios ativos, menções frequentes)
-     * 81-100 = referência do segmento (citada em múltiplas fontes relevantes)
-   - Cobertura (peso 30%):
-     * 0-20 = ausente em buscas do segmento e em diretórios
-     * 21-50 = aparece em 1 tipo de busca ou em diretórios básicos
-     * 51-75 = aparece em 2-3 tipos de busca ou tem boa presença em diretórios
-     * 76-100 = presente em buscas genéricas, diretórios e redes profissionais
-   - Posicionamento (peso 30%):
-     * 0-30 = não identificável como referência no segmento
-     * 31-60 = existe mas não se diferencia
-     * 61-80 = alguma diferenciação percebida
-     * 81-100 = posicionamento claro e diferenciado
+3. Avalie nas 3 dimensões (0-100) com critério realista:
 
-5. Score = (autoridade * 0.4) + (cobertura * 0.3) + (posicionamento * 0.3)
+   Autoridade (peso 40%):
+   - 0-20 = nunca citada, sem presença digital verificável
+   - 21-40 = raramente citada, presença mínima
+   - 41-60 = às vezes aparece em buscas, site ativo com algum conteúdo
+   - 61-80 = citada frequentemente, boa presença em múltiplos canais
+   - 81-100 = referência clara do segmento, citada amplamente
+
+   Cobertura (peso 30%):
+   - 0-20 = ausente em todas as buscas do segmento
+   - 21-50 = aparece em 1 tipo de busca
+   - 51-75 = aparece em 2-3 tipos de busca
+   - 76-100 = presente em todos os tipos de busca relevantes
+
+   Posicionamento (peso 30%):
+   - 0-30 = não identificável como referência no segmento
+   - 31-60 = existe mas não se diferencia
+   - 61-80 = alguma diferenciação percebida
+   - 81-100 = posicionamento claro e diferenciado
+
+4. Score = (autoridade * 0.4) + (cobertura * 0.3) + (posicionamento * 0.3)
+
+REFERÊNCIA DE SCORES — use para calibrar:
+- 0-25: empresa invisível, sem presença digital relevante para IAs
+- 26-45: presença mínima, aparece em poucos contextos
+- 46-65: presença moderada, reconhecida em algumas buscas — empresa com site ativo, Google Meu Negócio e algum conteúdo deve ficar nessa faixa
+- 66-80: boa presença, aparece consistentemente em buscas do segmento
+- 81-100: referência do segmento nas IAs
 
 Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de código:
 {
@@ -109,14 +112,14 @@ Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de códi
   "scoreLabel": "frase curta descrevendo o nível real de presença encontrado",
   "scoreSub": "frase de impacto baseada no que foi encontrado nas buscas",
   "dimensoes": { "autoridade": 30, "cobertura": 35, "posicionamento": 40 },
-  "diagnostico": "2-3 frases baseadas no que foi encontrado de verdade nas buscas. Mencione evidências reais incluindo presença em diretórios encontrada. Mencione a empresa pelo nome e o recorte de ${geo}.",
+  "diagnostico": "2-3 frases baseadas no que foi encontrado de verdade nas buscas. Mencione evidências reais. Mencione a empresa pelo nome e o recorte de ${geo}.",
   "perguntasSimuladas": "Com base nas buscas realizadas, descreva em texto corrido o que uma IA generativa responderia sobre ${segmento} em ${geo} e se ${empresa} apareceria ou não. Máximo 4 parágrafos.",
   "quemDomina": "Com base nas buscas, quem realmente aparece quando se busca ${segmento} em ${geo}. Seja específico sobre o que foi encontrado.",
-  "gaps": "3-4 lacunas concretas identificadas nas buscas — o que está faltando na presença digital de ${empresa}. Baseie-se apenas no que foi realmente verificado, não em suposições.",
+  "gaps": "3-4 lacunas concretas identificadas nas buscas — o que está faltando na presença digital de ${empresa}.",
   "proximosPassos": [
-    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas realmente encontradas"},
-    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas realmente encontradas"},
-    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas realmente encontradas"}
+    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"},
+    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"},
+    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"}
   ]
 }`;
 
@@ -135,7 +138,7 @@ Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de códi
         tools: [{
           type: 'web_search_20250305',
           name: 'web_search',
-          max_uses: 6
+          max_uses: 5
         }],
         messages: [{ role: 'user', content: prompt }]
       })
