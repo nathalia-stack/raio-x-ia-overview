@@ -27,7 +27,6 @@ export default async function handler(req, res) {
     nacional: 'todo o Brasil'
   }[abrangencia] || `a cidade de ${cidade}`;
 
-  // Notificação via Formspree — não bloqueia a análise
   async function notificarFormspree() {
     try {
       await fetch('https://formspree.io/f/mwvzlbeo', {
@@ -74,9 +73,14 @@ INSTRUÇÕES:
    - Aparece em diretórios, portais, notícias locais?
    - Tem avaliações em plataformas públicas?
    - Produz conteúdo relevante para o segmento?
-   - Concorrentes aparecem mais do que ela nas buscas?
+   - Concorrentes aparecem mais do que ela nas buscas genéricas do segmento?
 
-3. Avalie nas 3 dimensões (0-100) com critério realista:
+3. REGRAS CRÍTICAS para os gaps e diagnóstico:
+   - NÃO afirme que a empresa "não tem Google Meu Negócio" ou "não está em diretórios" apenas porque não apareceu em buscas genéricas. Google Meu Negócio não é indexado em buscas textuais — sua ausência nos resultados de busca NÃO significa que o perfil não existe.
+   - O gap real é: a empresa não aparece em buscas genéricas sobre o segmento, não que ela não tem cadastros. Formule os gaps com essa precisão.
+   - Foque nos gaps de VISIBILIDADE (não aparecer quando buscam pelo segmento) e de AUTORIDADE (poucos terceiros falando da marca), não em suposições sobre cadastros que você não verificou.
+
+4. Avalie nas 3 dimensões (0-100) com critério realista:
 
    Autoridade (peso 40%):
    - 0-20 = nunca citada, sem presença digital verificável
@@ -97,12 +101,12 @@ INSTRUÇÕES:
    - 61-80 = alguma diferenciação percebida
    - 81-100 = posicionamento claro e diferenciado
 
-4. Score = (autoridade * 0.4) + (cobertura * 0.3) + (posicionamento * 0.3)
+5. Score = (autoridade * 0.4) + (cobertura * 0.3) + (posicionamento * 0.3)
 
 REFERÊNCIA DE SCORES — use para calibrar:
 - 0-25: empresa invisível, sem presença digital relevante para IAs
 - 26-45: presença mínima, aparece em poucos contextos
-- 46-65: presença moderada, reconhecida em algumas buscas — empresa com site ativo, Google Meu Negócio e algum conteúdo deve ficar nessa faixa
+- 46-65: presença moderada, reconhecida em algumas buscas — empresa com site ativo e algum conteúdo deve ficar nessa faixa
 - 66-80: boa presença, aparece consistentemente em buscas do segmento
 - 81-100: referência do segmento nas IAs
 
@@ -115,11 +119,11 @@ Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de códi
   "diagnostico": "2-3 frases baseadas no que foi encontrado de verdade nas buscas. Mencione evidências reais. Mencione a empresa pelo nome e o recorte de ${geo}.",
   "perguntasSimuladas": "Com base nas buscas realizadas, descreva em texto corrido o que uma IA generativa responderia sobre ${segmento} em ${geo} e se ${empresa} apareceria ou não. Máximo 4 parágrafos.",
   "quemDomina": "Com base nas buscas, quem realmente aparece quando se busca ${segmento} em ${geo}. Seja específico sobre o que foi encontrado.",
-  "gaps": "3-4 lacunas concretas identificadas nas buscas — o que está faltando na presença digital de ${empresa}.",
+  "gaps": "3-4 lacunas de VISIBILIDADE concretas — foque em onde a empresa não aparece nas buscas e por quê, não em suposições sobre cadastros não verificados.",
   "proximosPassos": [
-    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"},
-    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"},
-    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"}
+    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas de visibilidade encontradas"},
+    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas de visibilidade encontradas"},
+    {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas de visibilidade encontradas"}
   ]
 }`;
 
