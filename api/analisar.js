@@ -27,7 +27,6 @@ export default async function handler(req, res) {
     nacional: 'todo o Brasil'
   }[abrangencia] || `a cidade de ${cidade}`;
 
-  // Notificação via Formspree — não bloqueia a análise
   async function notificarFormspree() {
     try {
       await fetch('https://formspree.io/f/mwvzlbeo', {
@@ -48,6 +47,8 @@ export default async function handler(req, res) {
   }
 
   notificarFormspree();
+
+  const hoje = new Date().toLocaleDateString('pt-BR');
 
   const prompt = `Você é um especialista em GEO (Generative Engine Optimization) e visibilidade de marcas em IAs generativas.
 
@@ -72,23 +73,29 @@ INSTRUÇÕES:
 2. Com base no que ENCONTROU de verdade (não simule), avalie:
    - A empresa tem site ativo e bem estruturado?
    - Aparece em diretórios, portais, notícias locais?
-   - Tem avaliações em plataformas públicas?
+   - Tem avaliações em plataformas públicas indexadas?
    - Produz conteúdo relevante para o segmento?
    - Concorrentes aparecem mais do que ela nas buscas?
 
-3. Avalie nas 3 dimensões (0-100) com critério realista:
+3. IMPORTANTE sobre o diagnóstico e gaps:
+   - Baseie-se apenas no que foi encontrado nas buscas textuais realizadas
+   - NÃO faça afirmações sobre ausência de Google Meu Negócio, LinkedIn ou outros perfis que não são indexados em buscas textuais — esses canais existem mas não aparecem nos resultados de busca que você acessa
+   - Foque nos gaps de visibilidade que são verificáveis: ausência em rankings, diretórios de texto, portais, notícias, conteúdo indexado
+   - Use linguagem de evidência: "não foram encontradas menções em...", "nos resultados analisados, não aparece em..."
+
+4. Avalie nas 3 dimensões (0-100) com critério realista:
    - Autoridade (peso 40%): 0-20 = nunca citada; 21-40 = raramente; 41-60 = às vezes em buscas genéricas; 61-80 = frequente; 81-100 = referência do segmento
    - Cobertura (peso 30%): 0-20 = ausente em todas as perguntas; 21-50 = aparece em 1 pergunta; 51-75 = aparece em 2-3; 76-100 = presente em todas
    - Posicionamento (peso 30%): 0-30 = mercado não reconhecido pela IA; 31-60 = mercado existe mas empresa não está posicionada; 61-80 = posicionada mas genérica; 81-100 = posicionamento claro e diferenciado
 
-4. Score = (autoridade * 0.4) + (cobertura * 0.3) + (posicionamento * 0.3)
+5. Score = (autoridade * 0.4) + (cobertura * 0.3) + (posicionamento * 0.3)
 
 Referência de scores:
-- 0-25: empresa invisível, sem presença digital relevante
-- 26-45: presença mínima, aparece em poucos contextos
-- 46-65: presença moderada, reconhecida em algumas buscas
-- 66-80: boa presença, aparece consistentemente
-- 81-100: referência do segmento na IA
+- 0-25: empresa invisível, sem presença digital indexada relevante
+- 26-45: presença mínima, aparece em poucos contextos indexados
+- 46-65: presença moderada, reconhecida em algumas buscas — empresa com site ativo e conteúdo deve ficar nessa faixa
+- 66-80: boa presença, aparece consistentemente em buscas do segmento
+- 81-100: referência do segmento nas IAs
 
 Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de código:
 {
@@ -99,12 +106,13 @@ Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de códi
   "diagnostico": "2-3 frases baseadas no que foi encontrado de verdade nas buscas. Mencione evidências reais. Mencione a empresa pelo nome e o recorte de ${geo}.",
   "perguntasSimuladas": "Com base nas buscas realizadas, descreva em texto corrido o que uma IA generativa responderia sobre ${segmento} em ${geo} e se ${empresa} apareceria ou não. Máximo 4 parágrafos.",
   "quemDomina": "Com base nas buscas, quem realmente aparece quando se busca ${segmento} em ${geo}. Seja específico sobre o que foi encontrado.",
-  "gaps": "3-4 lacunas concretas identificadas nas buscas — o que está faltando na presença digital de ${empresa}.",
+  "gaps": "3-4 lacunas de visibilidade identificadas nas buscas — use linguagem de evidência baseada no que foi encontrado, sem afirmar ausência de canais não verificáveis via busca textual.",
   "proximosPassos": [
     {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"},
     {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"},
     {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"}
-  ]
+  ],
+  "notaMetodologica": "Diagnóstico baseado em evidências de indexação pública coletadas em ${hoje}. Canais como Google Meu Negócio, LinkedIn e redes sociais existem mas podem não aparecer em buscas textuais — o score reflete visibilidade em conteúdo indexado publicamente."
 }`;
 
   try {
@@ -116,7 +124,7 @@ Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de códi
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5',
         max_tokens: 3000,
         temperature: 0,
         tools: [{
