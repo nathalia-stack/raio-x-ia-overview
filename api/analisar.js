@@ -2,7 +2,6 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
@@ -51,9 +50,7 @@ export default async function handler(req, res) {
   const hoje = new Date().toLocaleDateString('pt-BR');
 
   const prompt = `Você é um especialista em GEO (Generative Engine Optimization) e visibilidade de marcas em IAs generativas.
-
 Sua tarefa é fazer uma análise REAL e BASEADA EM EVIDÊNCIAS da presença digital da empresa abaixo.
-
 DADOS DA EMPRESA:
 - Nome: ${empresa}
 - Site: ${site || 'não informado'}
@@ -61,7 +58,6 @@ DADOS DA EMPRESA:
 - Área de atuação: ${abrangenciaTexto}
 - Concorrentes: ${concorrentes || 'não informados'}
 - Observações: ${obs || 'nenhuma'}
-
 INSTRUÇÕES:
 1. Use web search para buscar informações REAIS sobre esta empresa. Faça as seguintes buscas:
    - "${empresa} ${cidade}" — presença geral
@@ -69,34 +65,28 @@ INSTRUÇÕES:
    - "${empresa} avaliação OR review OR reclamação" — o que clientes dizem
    - "melhores empresas ${segmento} ${geo}" — quem aparece no lugar dela
    - "${empresa} ${segmento}" — autoridade no segmento
-
 2. Com base no que ENCONTROU de verdade (não simule), avalie:
    - A empresa tem site ativo e bem estruturado?
    - Aparece em diretórios, portais, notícias locais?
    - Tem avaliações em plataformas públicas indexadas?
    - Produz conteúdo relevante para o segmento?
    - Concorrentes aparecem mais do que ela nas buscas?
-
 3. IMPORTANTE sobre o diagnóstico e gaps:
    - Baseie-se apenas no que foi encontrado nas buscas textuais realizadas
    - NÃO faça afirmações sobre ausência de Google Meu Negócio, LinkedIn ou outros perfis que não são indexados em buscas textuais — esses canais existem mas não aparecem nos resultados de busca que você acessa
    - Foque nos gaps de visibilidade que são verificáveis: ausência em rankings, diretórios de texto, portais, notícias, conteúdo indexado
    - Use linguagem de evidência: "não foram encontradas menções em...", "nos resultados analisados, não aparece em..."
-
 4. Avalie nas 3 dimensões (0-100) com critério realista:
    - Autoridade (peso 40%): 0-20 = nunca citada; 21-40 = raramente; 41-60 = às vezes em buscas genéricas; 61-80 = frequente; 81-100 = referência do segmento
    - Cobertura (peso 30%): 0-20 = ausente em todas as perguntas; 21-50 = aparece em 1 pergunta; 51-75 = aparece em 2-3; 76-100 = presente em todas
    - Posicionamento (peso 30%): 0-30 = mercado não reconhecido pela IA; 31-60 = mercado existe mas empresa não está posicionada; 61-80 = posicionada mas genérica; 81-100 = posicionamento claro e diferenciado
-
 5. Score = (autoridade * 0.4) + (cobertura * 0.3) + (posicionamento * 0.3)
-
 Referência de scores:
 - 0-25: empresa invisível, sem presença digital indexada relevante
 - 26-45: presença mínima, aparece em poucos contextos indexados
 - 46-65: presença moderada, reconhecida em algumas buscas — empresa com site ativo e conteúdo deve ficar nessa faixa
 - 66-80: boa presença, aparece consistentemente em buscas do segmento
 - 81-100: referência do segmento nas IAs
-
 Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de código:
 {
   "score": 35,
@@ -124,7 +114,7 @@ Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de códi
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'model: 'claude-haiku-4-5-20251001',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 3000,
         temperature: 0,
         tools: [{
