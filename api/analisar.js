@@ -124,7 +124,7 @@ Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de códi
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'model: 'claude-haiku-4-5-20251001',
         max_tokens: 3000,
         temperature: 0,
         tools: [{
