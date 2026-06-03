@@ -73,8 +73,8 @@ INSTRUÇÕES:
    - Concorrentes aparecem mais do que ela nas buscas?
 3. IMPORTANTE sobre o diagnóstico e gaps:
    - Baseie-se apenas no que foi encontrado nas buscas textuais realizadas
-   - NÃO faça afirmações sobre ausência de Google Meu Negócio, LinkedIn ou outros perfis que não são indexados em buscas textuais — esses canais existem mas não aparecem nos resultados de busca que você acessa
-   - Foque nos gaps de visibilidade que são verificáveis: ausência em rankings, diretórios de texto, portais, notícias, conteúdo indexado
+   - NÃO faça afirmações sobre ausência de Google Meu Negócio, LinkedIn ou outros perfis que não são indexados em buscas textuais
+   - Foque nos gaps de visibilidade verificáveis: ausência em rankings, diretórios, portais, notícias, conteúdo indexado
    - Use linguagem de evidência: "não foram encontradas menções em...", "nos resultados analisados, não aparece em..."
 4. Avalie nas 3 dimensões (0-100) com critério realista:
    - Autoridade (peso 40%): 0-20 = nunca citada; 21-40 = raramente; 41-60 = às vezes em buscas genéricas; 61-80 = frequente; 81-100 = referência do segmento
@@ -84,19 +84,19 @@ INSTRUÇÕES:
 Referência de scores:
 - 0-25: empresa invisível, sem presença digital indexada relevante
 - 26-45: presença mínima, aparece em poucos contextos indexados
-- 46-65: presença moderada, reconhecida em algumas buscas — empresa com site ativo e conteúdo deve ficar nessa faixa
+- 46-65: presença moderada, reconhecida em algumas buscas
 - 66-80: boa presença, aparece consistentemente em buscas do segmento
 - 81-100: referência do segmento nas IAs
-Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de código:
+IMPORTANTE: Responda APENAS com JSON válido. Sem texto antes ou depois. Sem blocos de código. Sem tags de citação como <cite> — escreva tudo em texto corrido limpo.
 {
   "score": 35,
   "scoreLabel": "frase curta descrevendo o nível real de presença encontrado",
   "scoreSub": "frase de impacto baseada no que foi encontrado nas buscas",
   "dimensoes": { "autoridade": 30, "cobertura": 35, "posicionamento": 40 },
-  "diagnostico": "2-3 frases baseadas no que foi encontrado de verdade nas buscas. Mencione evidências reais. Mencione a empresa pelo nome e o recorte de ${geo}.",
-  "perguntasSimuladas": "Com base nas buscas realizadas, descreva em texto corrido o que uma IA generativa responderia sobre ${segmento} em ${geo} e se ${empresa} apareceria ou não. Máximo 4 parágrafos.",
-  "quemDomina": "Com base nas buscas, quem realmente aparece quando se busca ${segmento} em ${geo}. Seja específico sobre o que foi encontrado.",
-  "gaps": "3-4 lacunas de visibilidade identificadas nas buscas — use linguagem de evidência baseada no que foi encontrado, sem afirmar ausência de canais não verificáveis via busca textual.",
+  "diagnostico": "2-3 frases em texto corrido limpo, sem tags. Mencione evidências reais. Mencione a empresa pelo nome e o recorte geográfico.",
+  "perguntasSimuladas": "Texto corrido limpo, sem tags. O que uma IA generativa responderia sobre o segmento e se a empresa apareceria. Máximo 4 parágrafos.",
+  "quemDomina": "Texto corrido limpo, sem tags. Quem realmente aparece nas buscas do segmento.",
+  "gaps": "Texto corrido limpo, sem tags. 3-4 lacunas de visibilidade identificadas, com linguagem de evidência.",
   "proximosPassos": [
     {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"},
     {"titulo": "título da ação", "descricao": "ação concreta baseada nas lacunas encontradas"},
@@ -115,7 +115,7 @@ Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de códi
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 3000,
+        max_tokens: 4000,
         temperature: 0,
         tools: [{
           type: 'web_search_20250305',
@@ -135,11 +135,27 @@ Responda APENAS com JSON válido, sem texto antes ou depois, sem blocos de códi
       .join('')
       .trim();
 
-    const clean = textBlocks.replace(/```json|```/g, '').trim();
-    const jsonMatch = clean.match(/\{[\s\S]*\}/);
+    // Remove tags <cite ...> e </cite> que o modelo pode inserir
+    const cleaned = textBlocks.replace(/<cite[^>]*>/g, '').replace(/<\/cite>/g, '');
+
+    const withoutFences = cleaned.replace(/```json|```/g, '').trim();
+    const jsonMatch = withoutFences.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('JSON inválido');
     const result = JSON.parse(jsonMatch[0]);
-    return res.status(200).json({ ...result, geo });
+
+    // Limpa tags de cite em todos os campos string do resultado
+    function stripCite(val) {
+      if (typeof val === 'string') return val.replace(/<cite[^>]*>/g, '').replace(/<\/cite>/g, '');
+      if (Array.isArray(val)) return val.map(stripCite);
+      if (val && typeof val === 'object') {
+        const out = {};
+        for (const k in val) out[k] = stripCite(val[k]);
+        return out;
+      }
+      return val;
+    }
+
+    return res.status(200).json({ ...stripCite(result), geo });
   } catch (e) {
     console.log('Erro:', e.message);
     return res.status(500).json({ error: 'Erro na análise. Tente novamente.' });
