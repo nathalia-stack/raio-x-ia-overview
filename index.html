@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --cinza-fundo: #f0efec;
       --branco: #ffffff;
@@ -17,7 +16,6 @@
       --borda: #e2e0db;
       --laranja: #e07820;
     }
-
     body {
       font-family: "Open Sans", sans-serif;
       background: var(--cinza-fundo);
@@ -25,11 +23,8 @@
       min-height: 100vh;
       padding: 2.5rem 1rem;
     }
-
     .container { max-width: 640px; margin: 0 auto; }
-
     .header { margin-bottom: 3rem; }
-
     .logo-text {
       display: block;
       font-family: "Montserrat", sans-serif;
@@ -40,7 +35,6 @@
       color: #aaa;
       margin-bottom: 2rem;
     }
-
     h1 {
       font-family: "Montserrat", sans-serif;
       font-weight: 900;
@@ -49,16 +43,13 @@
       margin-bottom: 0.75rem;
       color: var(--preto);
     }
-
     h1 em { font-style: normal; color: var(--laranja); }
-
     .subtitle {
       font-size: 15px;
       color: var(--cinza-texto);
       line-height: 1.7;
       font-weight: 300;
     }
-
     .card {
       background: var(--branco);
       border-radius: 4px;
@@ -66,10 +57,8 @@
       margin-bottom: 1rem;
       border: 1px solid var(--borda);
     }
-
     .step { display: none; }
     .step.active { display: block; }
-
     .section-divider {
       font-size: 10px;
       font-weight: 700;
@@ -80,11 +69,8 @@
       padding-bottom: 0.5rem;
       border-bottom: 1px solid var(--borda);
     }
-
     .section-divider:first-child { margin-top: 0; }
-
     .field { margin-bottom: 1.25rem; }
-
     label {
       display: block;
       font-size: 11px;
@@ -94,9 +80,7 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
-
     label .opt { font-weight: 400; text-transform: none; color: #aaa; }
-
     input, select, textarea {
       width: 100%;
       padding: 11px 14px;
@@ -109,18 +93,14 @@
       outline: none;
       transition: border-color 0.15s;
     }
-
     input:focus, select:focus, textarea:focus {
       border-color: var(--preto);
       background: var(--branco);
     }
-
     input::placeholder, textarea::placeholder { color: #bbb; }
     textarea { height: 80px; resize: vertical; }
-
     .field-row { display: flex; gap: 12px; }
     .field-row .field { flex: 1; }
-
     .btn-primary {
       display: block; width: 100%;
       padding: 14px 24px;
@@ -132,14 +112,10 @@
       cursor: pointer; margin-top: 0.75rem;
       transition: background 0.15s;
     }
-
     .btn-primary:hover { background: #333; }
     .btn-primary:active { transform: scale(0.99); }
-
     .error-msg { font-size: 13px; color: #c0392b; margin-top: 8px; display: none; }
-
     .loader-wrap { text-align: center; padding: 1rem 0 2rem; }
-
     .spinner {
       width: 36px; height: 36px;
       border: 2px solid var(--borda);
@@ -148,42 +124,32 @@
       margin: 0 auto 1.5rem;
       animation: spin 0.8s linear infinite;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .loader-title {
       font-family: "Montserrat", sans-serif;
       font-size: 15px; font-weight: 700;
       margin-bottom: 1.25rem; color: var(--preto);
     }
-
     .progress-steps { list-style: none; display: inline-block; text-align: left; }
-
     .progress-steps li {
       font-size: 13px; color: #ccc;
       padding: 4px 0; display: flex;
       align-items: center; gap: 10px; transition: color 0.3s;
     }
-
     .progress-steps li .dot {
       width: 5px; height: 5px; border-radius: 50%;
       background: var(--borda); flex-shrink: 0; transition: background 0.3s;
     }
-
     .progress-steps li.done { color: #aaa; }
     .progress-steps li.done .dot { background: var(--laranja); }
     .progress-steps li.active { color: var(--preto); font-weight: 600; }
     .progress-steps li.active .dot { background: var(--preto); animation: pulse 1s infinite; }
-
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
     .loader-note { font-size: 12px; color: #bbb; margin-top: 1.25rem; }
-
     .score-area {
       text-align: center; margin-bottom: 2.5rem;
       padding-bottom: 2rem; border-bottom: 1px solid var(--borda);
     }
-
     .score-ring {
       width: 100px; height: 100px; border-radius: 50%;
       border: 5px solid var(--borda);
@@ -191,36 +157,28 @@
       align-items: center; justify-content: center;
       margin: 0 auto 1rem;
     }
-
     .score-num {
       font-family: "Montserrat", sans-serif;
       font-size: 30px; font-weight: 900; line-height: 1;
     }
-
     .score-max { font-size: 11px; color: #aaa; }
-
     .score-label {
       font-family: "Montserrat", sans-serif;
       font-size: 15px; font-weight: 700; margin-bottom: 6px;
     }
-
     .score-sub { font-size: 13px; color: var(--cinza-texto); line-height: 1.6; max-width: 420px; margin: 0 auto; }
-
     .geo-tag {
       display: inline-block; font-size: 10px; padding: 3px 10px;
       border-radius: 2px; background: var(--cinza-fundo);
       color: #aaa; margin-top: 12px;
       letter-spacing: 0.05em; text-transform: uppercase;
     }
-
     .section-title {
       font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
       text-transform: uppercase; color: #bbb;
       margin: 2rem 0 0.75rem;
     }
-
     .dims { display: flex; flex-direction: column; gap: 12px; }
-
     .dim-row { display: flex; align-items: center; font-size: 13px; gap: 12px; }
     .dim-label { color: var(--cinza-texto); min-width: 110px; }
     .dim-bar { flex: 1; height: 3px; background: var(--borda); }
@@ -230,7 +188,6 @@
       font-weight: 700; min-width: 28px;
       text-align: right; font-size: 13px;
     }
-
     .block {
       background: var(--cinza-fundo);
       border-left: 3px solid var(--laranja);
@@ -240,28 +197,22 @@
       color: var(--cinza-texto);
       white-space: pre-wrap;
     }
-
     .next-step {
       padding: 1.25rem 0;
       border-bottom: 1px solid var(--borda);
     }
-
     .next-step:last-child { border-bottom: none; }
-
     .next-step-num {
       font-size: 10px; font-weight: 700;
       color: var(--laranja); letter-spacing: 0.08em;
       text-transform: uppercase; margin-bottom: 4px;
     }
-
     .next-step-title {
       font-family: "Montserrat", sans-serif;
       font-size: 14px; font-weight: 700;
       margin-bottom: 6px; color: var(--preto);
     }
-
     .next-step-desc { font-size: 13px; color: var(--cinza-texto); line-height: 1.6; font-weight: 300; }
-
     .nota-metodologica {
       font-size: 11px;
       color: #bbb;
@@ -270,12 +221,10 @@
       padding-top: 1rem;
       border-top: 1px solid var(--borda);
     }
-
     .cta-area {
       display: flex; gap: 10px; flex-wrap: wrap;
       margin-top: 1.5rem;
     }
-
     .btn-cta {
       flex: 1; padding: 13px 20px;
       font-size: 11px; font-weight: 700;
@@ -284,17 +233,14 @@
       border-radius: 2px; border: none; cursor: pointer;
       transition: background 0.15s;
     }
-
     .btn-cta-primary { background: var(--laranja); color: var(--branco); }
     .btn-cta-primary:hover { background: #c96a18; }
     .btn-cta-secondary { background: var(--cinza-fundo); color: var(--preto); border: 1px solid var(--borda); }
     .btn-cta-secondary:hover { background: var(--borda); }
-
     .footer {
       text-align: center; margin-top: 2.5rem;
       font-size: 11px; color: #bbb; letter-spacing: 0.03em;
     }
-
     @media (max-width: 480px) {
       h1 { font-size: 22px; }
       .card { padding: 1.5rem; }
@@ -303,13 +249,11 @@
 </head>
 <body>
 <div class="container">
-
   <div class="header">
     <span class="logo-text">Papa PPG</span>
     <h1>Se um cliente perguntasse pra IA quem contratar no seu mercado… <em>sua empresa apareceria?</em></h1>
     <p class="subtitle">Diagnóstico de visibilidade em IAs generativas como ChatGPT, Gemini e Perplexity — com score, análise e plano de ação.</p>
   </div>
-
   <div class="card step active" id="step-form">
     <div class="section-divider">Seus dados</div>
     <div class="field">
@@ -320,7 +264,6 @@
       <label>Seu e-mail</label>
       <input type="email" id="email_contato" placeholder="Ex: ana@empresa.com.br" />
     </div>
-
     <div class="section-divider">Sobre a empresa</div>
     <div class="field">
       <label>Nome da empresa</label>
@@ -364,7 +307,6 @@
     <button class="btn-primary" onclick="startAnalysis()">Analisar presença na IA →</button>
     <p class="error-msg" id="form-error">Preencha nome, e-mail, empresa, segmento e cidade.</p>
   </div>
-
   <div class="card step" id="step-loading">
     <div class="loader-wrap">
       <div class="spinner"></div>
@@ -379,7 +321,6 @@
       <p class="loader-note">Isso pode levar até 30 segundos</p>
     </div>
   </div>
-
   <div class="step" id="step-result">
     <div class="card">
       <div class="score-area">
@@ -391,7 +332,6 @@
         <p class="score-sub" id="score-sub"></p>
         <span class="geo-tag" id="geo-tag"></span>
       </div>
-
       <p class="section-title">Dimensões de presença</p>
       <div class="dims">
         <div class="dim-row">
@@ -410,37 +350,27 @@
           <span class="dim-val" id="val-posicionamento">—</span>
         </div>
       </div>
-
       <p class="section-title">Diagnóstico</p>
       <div class="block" id="txt-diagnostico"></div>
-
       <p class="section-title">O que a IA responde sobre seu segmento</p>
       <div class="block" id="txt-perguntas"></div>
-
       <p class="section-title">Quem está dominando</p>
       <div class="block" id="txt-dominando"></div>
-
       <p class="section-title">Onde você deveria aparecer (e não aparece)</p>
       <div class="block" id="txt-gaps"></div>
-
       <p class="section-title">O que fazer agora</p>
       <div id="next-steps"></div>
-
       <div class="nota-metodologica" id="nota-metodologica"></div>
-
       <div class="cta-area">
         <button class="btn-cta btn-cta-secondary" onclick="restart()">Nova análise</button>
         <button class="btn-cta btn-cta-primary" onclick="window.location.href='mailto:contato@papa.ppg.br?subject=Quero um plano de ação completo'">Quero um plano de ação →</button>
       </div>
     </div>
   </div>
-
   <div class="footer">Desenvolvido por Papa PPG · Estratégia de conteúdo e presença na era da IA</div>
 </div>
-
 <script>
 var progressTimer;
-
 function advanceProgress(step) {
   for (var i = 1; i <= 5; i++) {
     var el = document.getElementById("p" + i);
@@ -449,7 +379,6 @@ function advanceProgress(step) {
     else if (i === step) el.classList.add("active");
   }
 }
-
 async function notificarFormspree(dados) {
   try {
     await fetch("https://formspree.io/f/mwvzlbeo", {
@@ -468,31 +397,26 @@ async function notificarFormspree(dados) {
     console.log("Formspree erro:", e);
   }
 }
-
 async function startAnalysis() {
   var nome_contato  = document.getElementById("nome_contato").value.trim();
   var email_contato = document.getElementById("email_contato").value.trim();
   var empresa       = document.getElementById("empresa").value.trim();
   var segmento      = document.getElementById("segmento").value.trim();
   var cidade        = document.getElementById("cidade").value.trim();
-
   if (!nome_contato || !email_contato || !empresa || !segmento || !cidade) {
     document.getElementById("form-error").style.display = "block";
     return;
   }
   document.getElementById("form-error").style.display = "none";
   showStep("step-loading");
-
   var step = 1;
   advanceProgress(step);
   progressTimer = setInterval(function() {
     step++;
     if (step <= 5) advanceProgress(step);
   }, 5000);
-
   var estado      = document.getElementById("estado").value.trim();
   var abrangencia = document.getElementById("abrangencia").value;
-
   notificarFormspree({
     nome: nome_contato,
     email: email_contato,
@@ -500,7 +424,6 @@ async function startAnalysis() {
     segmento: segmento,
     cidade: cidade + (estado ? ", " + estado : "")
   });
-
   fetch("/api/analisar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -531,63 +454,51 @@ async function startAnalysis() {
     err.style.display = "block";
   });
 }
-
 function renderResult(r) {
   var score = Math.round(r.score || 0);
   document.getElementById("score-val").textContent = score;
   document.getElementById("score-label").textContent = r.scoreLabel || "";
   document.getElementById("score-sub").textContent = r.scoreSub || "";
   document.getElementById("geo-tag").textContent = "Recorte: " + (r.geo || "");
-
   var ring = document.getElementById("score-ring");
   ring.style.borderColor = score < 35 ? "#c0392b" : score < 65 ? "#e07820" : "#27ae60";
-
   var d = r.dimensoes || {};
   ["autoridade","cobertura","posicionamento"].forEach(function(k) {
     var v = Math.round(d[k] || 0);
     document.getElementById("bar-" + k).style.width = v + "%";
     document.getElementById("val-" + k).textContent = v;
   });
-
   document.getElementById("txt-diagnostico").textContent = r.diagnostico || "";
   document.getElementById("txt-perguntas").textContent = r.perguntasSimuladas || "";
   document.getElementById("txt-dominando").textContent = r.quemDomina || "";
-
   var gaps = r.gaps;
   if (Array.isArray(gaps)) {
     document.getElementById("txt-gaps").textContent = gaps.map(function(g, i) {
       return typeof g === "object" ? (i+1) + ". " + (g.titulo||"") + ": " + (g.descricao||"") : g;
-    }).join("
-
-");
+    }).join("\n\n");
   } else {
     document.getElementById("txt-gaps").textContent = gaps || "";
   }
-
   var nextSteps = r.proximosPassos || [];
   document.getElementById("next-steps").innerHTML = nextSteps.map(function(s, i) {
     var titulo = typeof s === "object" ? (s.titulo || "") : s;
     var desc = typeof s === "object" ? (s.descricao || "") : "";
     return '<div class="next-step">' +
-      '<div class="next-step-num">→ Passo 0' + (i+1) + '</div>' +
+      '<div class="next-step-num">\u2192 Passo 0' + (i+1) + '</div>' +
       '<div class="next-step-title">' + titulo + '</div>' +
       (desc ? '<div class="next-step-desc">' + desc + '</div>' : '') +
       '</div>';
   }).join("");
-
   var nota = document.getElementById("nota-metodologica");
   if (nota) {
-    nota.textContent = r.notaMetodologica || "Diagnóstico baseado em evidências de indexação pública. Canais como Google Meu Negócio e LinkedIn existem mas podem não aparecer em buscas textuais — o score reflete visibilidade em conteúdo indexado publicamente.";
+    nota.textContent = r.notaMetodologica || "Diagn\u00f3stico baseado em evid\u00eancias de indexa\u00e7\u00e3o p\u00fablica. Canais como Google Meu Neg\u00f3cio e LinkedIn existem mas podem n\u00e3o aparecer em buscas textuais \u2014 o score reflete visibilidade em conte\u00fado indexado publicamente.";
   }
-
   showStep("step-result");
 }
-
 function showStep(id) {
   document.querySelectorAll(".step").forEach(function(s) { s.classList.remove("active"); });
   document.getElementById(id).classList.add("active");
 }
-
 function restart() {
   showStep("step-form");
 }
